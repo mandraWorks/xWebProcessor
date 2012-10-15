@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2009 sp1 (http://www.altova.com) by Jean Plé (Symbios Orthopédie SA) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xWeb="http://www.pspsmartsoft.com/xWebML" targetNamespace="http://www.pspsmartsoft.com/xWebML">
+	<xs:complexType name="EntryType">
+		<xs:sequence>
+			<xs:element name="Key" type="xs:string"/>
+			<xs:element name="Value" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="StringListType">
+		<xs:sequence minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="Entry" type="xWeb:EntryType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="StringList" type="xWeb:StringListType"/>
+</xs:schema>

@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<!-- edited with XMLSpy v2009 sp1 (http://www.altova.com) by Jean Plé (Symbios Orthopédie SA) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xWeb="http://www.pspsmartsoft.com/xWebML" targetNamespace="http://www.pspsmartsoft.com/xWebML">
+	<xs:include schemaLocation="xWebMLStringList.xsd"/>
+	<xs:complexType name="FileItemConfigType">
+		<xs:sequence>
+			<xs:element name="StringList" type="xWeb:StringListType" minOccurs="0"/>
+			<xs:element name="ContentPrefix" type="xs:string" minOccurs="0"/>
+			<xs:element name="ActiveMenuIDs" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence minOccurs="0" maxOccurs="unbounded">
+						<xs:element name="MenuID" type="xs:string"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FileItemType">
+		<xs:sequence>
+			<xs:element name="ProcessingMethod" type="xs:string"/>
+			<xs:element name="SourceFilePath" type="xs:string"/>
+			<xs:element name="TargetFileName" type="xs:string"/>
+			<xs:element name="Configuration" type="xWeb:FileItemConfigType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FolderType">
+		<xs:sequence>
+			<xs:element name="Name" type="xs:string"/>
+			<xs:element name="Children">
+				<xs:complexType>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:element name="Folder" type="xWeb:FolderType"/>
+						<xs:element name="FileItem" type="xWeb:FileItemType"/>
+						<xs:element name="StaticFolder" type="xWeb:StaticFolderType"/>
+					</xs:choice>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="StaticFolderType">
+		<xs:sequence>
+			<xs:element name="Name" type="xs:string"/>
+			<xs:element name="SourceFolder" type="xs:string"/>
+			<xs:element name="CopyRecursive" type="xs:boolean" default="true"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ProjectType">
+		<xs:sequence>
+			<xs:element name="Settings">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="OutputFolder" type="xs:string"/>
+						<xs:element name="StringList" type="xWeb:StringListType"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Content" type="xWeb:FolderType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="xWebProject" type="xWeb:ProjectType"/>
+</xs:schema>

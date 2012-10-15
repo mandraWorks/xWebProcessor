@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2009 sp1 (http://www.altova.com) by Jean Plé (Symbios Orthopédie SA) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xWeb="http://www.pspsmartsoft.com/xWebML" targetNamespace="http://www.pspsmartsoft.com/xWebML">
+	<xs:complexType name="StringType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string"/>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="ContentLinkType">
+		<xs:sequence>
+			<xs:element name="Folder" type="xs:string"/>
+			<xs:element name="FileName" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ContentType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string"/>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="MenuType">
+		<xs:sequence>
+			<xs:element name="TemplateFile" type="xs:string"/>
+			<xs:element name="LinkListFile" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="String" type="xWeb:StringType"/>
+	<xs:element name="ContentLink" type="xWeb:ContentLinkType"/>
+	<xs:element name="Content" type="xWeb:ContentType"/>
+	<xs:element name="Menu" type="xWeb:MenuType"/>
+</xs:schema>
