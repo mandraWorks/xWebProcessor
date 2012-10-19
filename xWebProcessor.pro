@@ -34,6 +34,14 @@ VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_PATCH}
 include($${APPROOT}/Modules/00_configEnv.pri)
 include($${FRAMEWORKROOT}/Modules/01_foundation_MwCore.pri)
 include($${FRAMEWORKROOT}/Modules/01_foundation_MwCmd.pri)
+include($${FRAMEWORKROOT}/Modules/01_foundation_xsd.pri)
+include($${FRAMEWORKROOT}/Modules/01_foundation_ctemplate.pri)
+
+include($${PWD}/Modules/03_model_xWebML.pri)
+#include($${PWD}/Modules/03_model_xWebML_generation.pri)
+include($${PWD}/Modules/03_model_xWebProc.pri)
+
+include($${PWD}/Modules/04_logic_xWebProc.pri)
 
 include($${PWD}/Modules/06_app_Common.pri)
 

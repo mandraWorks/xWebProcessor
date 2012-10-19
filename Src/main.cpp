@@ -14,6 +14,7 @@
 
 #include "app/common/CommandLineParams.h"
 
+#include "logic/xWebProc/xWebProcessor.h"
 
 
 int main ( int argc, char **argv )
@@ -47,6 +48,11 @@ int main ( int argc, char **argv )
 
       if ( parser.exists(CommandLineParams::ProjectFile) ) {
         QString projectFile = parser.value(CommandLineParams::ProjectFile);
+
+        xWebProcessor processor;
+
+        processor.setProjectFilePath(projectFile);
+        processor.run();
       }
 
 
