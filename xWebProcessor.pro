@@ -45,6 +45,8 @@ include($${PWD}/Modules/04_logic_xWebProc.pri)
 
 include($${PWD}/Modules/06_app_Common.pri)
 
+include($${PWD}/Modules/07_install.pri)
+
 
 
 HEADERS += $${SRCPATH}/xWebProcessorDefs.h

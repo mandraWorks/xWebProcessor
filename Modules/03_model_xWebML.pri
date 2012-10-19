@@ -6,7 +6,7 @@ MY_INCLUDE_PRIFILES += modelxWebML
 HEADERS +=  $${AUTOGEN_SRCPATH}/xWebMLStringList.hxx \
 			$${AUTOGEN_SRCPATH}/xWebMLProject.hxx \
 			$${AUTOGEN_SRCPATH}/xWebMLTemplate.hxx \
-			$${AUTOGEN_SRCPATH}/xWebMLLinkList.hxx \
+                        $${AUTOGEN_SRCPATH}/xWebMLLinkList.hxx \
 
 
 SOURCES +=  $${AUTOGEN_SRCPATH}/xWebMLStringList.cxx \
