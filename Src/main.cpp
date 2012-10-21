@@ -5,7 +5,10 @@
 #include "mandraworks/core/Log/LogManager.h"
 #include "mandraworks/core/Log/LogListenerAll.h"
 #include "mandraworks/core/Log/LogSinkSessionFile.h"
+#include "mandraworks/core/Log/LogSinkStdOut.h"
 #include "mandraworks/core/Log/LogFormaterSSV.h"
+#include "mandraworks/core/Log/LogFormaterSerial.h"
+
 
 #include "mandraworks/cmd/CommandLineParser.h"
 
@@ -26,13 +29,17 @@ int main ( int argc, char **argv )
     mandraworks::core::log::LogListener* listener = 0;
     mandraworks::core::log::Log::initialise();
     mandraworks::core::log::Log::manager()->registerListener( listener = new mandraworks::core::log::LogListenerAll(mandraworks::core::log::Log::manager()));
-    mandraworks::core::log::LogSinkSessionFile* sink = new mandraworks::core::log::LogSinkSessionFile(mandraworks::core::log::Log::manager());
 
+    mandraworks::core::log::LogSinkSessionFile* sink = new mandraworks::core::log::LogSinkSessionFile(mandraworks::core::log::Log::manager());
     sink->setOutputFolder(appEnv.applicationLogFolder(COMPANY_NAME, APPLICATION_NAME));
     sink->setFileBaseName(QString("%1_session.log").arg(APPLICATION_NAME).toLower());
     sink->connect(listener);
     sink->setFormater(new mandraworks::core::log::LogFormaterSSV(mandraworks::core::log::Log::manager()));
     sink->startLogging();
+
+    mandraworks::core::log::LogSinkStdOut* sink2 = new mandraworks::core::log::LogSinkStdOut(mandraworks::core::log::Log::manager());
+    sink2->connect(listener);
+    sink2->setFormater(new mandraworks::core::log::LogFormaterSerial(mandraworks::core::log::Log::manager()));
 
     // ********* end ************
 

@@ -27,204 +27,208 @@ xWebProcessor::~xWebProcessor() {
 }
 
 void xWebProcessor::setProjectFilePath(QString path) {
-  _projectFilePath = path;
+    _projectFilePath = path;
 }
 
 bool xWebProcessor::run() {
-  if ( QFile::exists(_projectFilePath) == false ) {
-    mandraworks::core::log::Log::error(QString("Project file do not exists: %1").arg(_projectFilePath));
-    return false;
-  }
+    if ( QFile::exists(_projectFilePath) == false ) {
+        mandraworks::core::log::Log::error(QString("Project file do not exists: %1").arg(_projectFilePath));
+        return false;
+    }
 
-  // deploy schemas
-  QFileInfo fileInfo(_projectFilePath);
-  QDir schemaDir(fileInfo.absolutePath());
-  if ( schemaDir.exists("Schemas") == true ) {
-    mandraworks::core::system::SystemLib::rmFolder(QString("%1/Schemas").arg(_projectFilePath));
-  }
+    // deploy schemas
+    QFileInfo fileInfo(_projectFilePath);
+    QDir schemaDir(fileInfo.absolutePath());
+    if ( schemaDir.exists("Schemas") == true ) {
+        mandraworks::core::system::SystemLib::rmFolder(QString("%1/Schemas").arg(_projectFilePath));
+    }
 
-  schemaDir.mkdir("Schemas");
-  schemaDir.cd("Schemas");
+    schemaDir.mkdir("Schemas");
+    schemaDir.cd("Schemas");
 
-  QFile::copy(":/xWebMLStringList.xsd", QString("%1/xWebMLStringList.xsd").arg(schemaDir.absolutePath()));
-  QFile::copy(":/xWebMLProject.xsd", QString("%1/xWebMLProject.xsd").arg(schemaDir.absolutePath()));
-  QFile::copy(":/xWebMLTemplate.xsd", QString("%1/xWebMLTemplate.xsd").arg(schemaDir.absolutePath()));
-  QFile::copy(":/xWebMLLinkList.xsd", QString("%1/xWebMLLinkList.xsd").arg(schemaDir.absolutePath()));
+    QFile::copy(":/xWebMLStringList.xsd", QString("%1/xWebMLStringList.xsd").arg(schemaDir.absolutePath()));
+    QFile::copy(":/xWebMLProject.xsd", QString("%1/xWebMLProject.xsd").arg(schemaDir.absolutePath()));
+    QFile::copy(":/xWebMLTemplate.xsd", QString("%1/xWebMLTemplate.xsd").arg(schemaDir.absolutePath()));
+    QFile::copy(":/xWebMLLinkList.xsd", QString("%1/xWebMLLinkList.xsd").arg(schemaDir.absolutePath()));
 
-  try {
-    _projectFile = xWebML::xWebProject(_projectFilePath.toLocal8Bit().constData());
-  } catch (const xml_schema::exception& ex) {
-    std::cout << ex << std::endl;
-    return false;
-  }
+    try {
+        _projectFile = xWebML::xWebProject(_projectFilePath.toLocal8Bit().constData());
+    } catch (const xml_schema::exception& ex) {
+        std::cout << ex << std::endl;
+        return false;
+    }
 
 
-  xWebProcessContext context(_projectFile->Settings());
+    xWebProcessContext context(_projectFile->Settings());
 
-  if ( prepareOutputFolder(context) == false )
-    return false;
+    if ( prepareOutputFolder(context) == false ) {
+        mandraworks::core::log::Log::error(QString("Prepare output folder faild: %1").arg(_projectFilePath));
+        return false;
+    }
 
-  if ( processContent(context, _projectFile->Content()) == false )
-    return false;
+    if ( processContent(context, _projectFile->Content()) == false ) {
+        mandraworks::core::log::Log::error(QString("Process content faild: %1").arg(_projectFilePath));
+        return false;
+    }
 
-  std::cout << "xWebProcessor succedded" << "\n";
+    mandraworks::core::log::Log::info(QString("xWebProcessor succedded"));
 
-  return true;
+    return true;
 }
 
 bool xWebProcessor::prepareOutputFolder(xWebProcessContext& context) {
-  mandraworks::core::log::Log::info(QString("Prepare outputfolder"));
+    mandraworks::core::log::Log::info(QString("Prepare outputfolder"));
 
-  context.initCurrentFolder();
+    context.initCurrentFolder();
 
-  mandraworks::core::log::Log::error(QString("Outputfolder: %1").arg(context.currentFolder()));
-  mandraworks::core::log::Log::info(QString("Clean outputfolder..."));
+    mandraworks::core::log::Log::error(QString("Outputfolder: %1").arg(context.currentFolder()));
+    mandraworks::core::log::Log::info(QString("Clean outputfolder..."));
 
-  QString outputFolderPath = context.currentFolder();
+    QString outputFolderPath = context.currentFolder();
 
-  mandraworks::core::system::SystemLib::rmFolder(outputFolderPath);
+    mandraworks::core::system::SystemLib::rmFolder(outputFolderPath);
 
-  QDir dir;
+    QDir dir;
 
-  dir.mkpath(outputFolderPath);
+    dir.mkpath(outputFolderPath);
 
-  return true;
+    return true;
 }
 
 bool xWebProcessor::processContent(xWebProcessContext& context, xWebML::FolderType& root) {
-  // process static folders
-  {
-    xWebML::Children::StaticFolder_iterator it = root.Children().StaticFolder().begin();
+    // process static folders
+    {
+        xWebML::Children::StaticFolder_iterator it = root.Children().StaticFolder().begin();
 
-    while ( it != root.Children().StaticFolder().end() ) {
-      xWebML::StaticFolderType xmlStaticFolder = *it;
+        while ( it != root.Children().StaticFolder().end() ) {
+            xWebML::StaticFolderType xmlStaticFolder = *it;
 
-      processStaticFolder(context, xmlStaticFolder);
+            processStaticFolder(context, xmlStaticFolder);
 
-      it++;
+            it++;
+        }
+
     }
 
-  }
+    // process normal folders
+    {
+        xWebML::Children::Folder_iterator it = root.Children().Folder().begin();
 
-  // process normal folders
-  {
-    xWebML::Children::Folder_iterator it = root.Children().Folder().begin();
+        while ( it != root.Children().Folder().end() ) {
+            xWebML::FolderType xmlFolder = *it;
 
-    while ( it != root.Children().Folder().end() ) {
-      xWebML::FolderType xmlFolder = *it;
+            processFolder(context, xmlFolder);
 
-      processFolder(context, xmlFolder);
-
-      it++;
+            it++;
+        }
     }
-  }
 
-  // process file items
-  {
-    xWebML::Children::FileItem_iterator it = root.Children().FileItem().begin();
+    // process file items
+    {
+        xWebML::Children::FileItem_iterator it = root.Children().FileItem().begin();
 
-    while ( it != root.Children().FileItem().end() ) {
-      xWebML::FileItemType xmlFileItem = *it;
+        while ( it != root.Children().FileItem().end() ) {
+            xWebML::FileItemType xmlFileItem = *it;
 
-      processFileItem(context, xmlFileItem);
+            processFileItem(context, xmlFileItem);
 
-      it++;
+            it++;
+        }
     }
-  }
 
-  return true;
+    return true;
 }
 
 bool xWebProcessor::processFolder(xWebProcessContext& context, xWebML::FolderType& folder) {
 
-  QString folderName = QString(folder.Name().c_str());
+    QString folderName = QString(folder.Name().c_str());
 
-  context.enqueueFolder(folderName);
+    context.enqueueFolder(folderName);
 
-  xWebML::Children::Folder_iterator it = folder.Children().Folder().begin();
+    xWebML::Children::Folder_iterator it = folder.Children().Folder().begin();
 
-  while ( it != folder.Children().Folder().end() ) {
-    xWebML::FolderType xmlFolder = *it;
+    while ( it != folder.Children().Folder().end() ) {
+        xWebML::FolderType xmlFolder = *it;
 
-    processFolder(context, xmlFolder);
+        processFolder(context, xmlFolder);
 
-    it++;
-  }
+        it++;
+    }
 
-  context.dequeueFolder();
+    context.dequeueFolder();
 
-  return true;
+    return true;
 }
 
 bool xWebProcessor::processStaticFolder(xWebProcessContext& context, xWebML::StaticFolderType& staticFolder) {
 
-  QString folderName = QString(staticFolder.Name().c_str());
-  QString currentFolder = QString("%1/%2").arg(context.currentFolder()).arg(folderName);
+    QString folderName = QString(staticFolder.Name().c_str());
+    QString currentFolder = QString("%1/%2").arg(context.currentFolder()).arg(folderName);
 
-  QDir dir;
-  dir.mkpath(currentFolder);
+    QDir dir;
+    dir.mkpath(currentFolder);
 
-  QString sourceFolder = QString(staticFolder.SourceFolder().c_str());
+    QString sourceFolder = QString(staticFolder.SourceFolder().c_str());
 
-  QDir dir2(sourceFolder);
-  QFileInfoList entries = dir2.entryInfoList(QDir::AllEntries|QDir::NoDotAndDotDot);
+    QDir dir2(sourceFolder);
+    QFileInfoList entries = dir2.entryInfoList(QDir::AllEntries|QDir::NoDotAndDotDot);
 
-  QString absSourceFolder = dir2.absolutePath();
+    QString absSourceFolder = dir2.absolutePath();
 
-  for ( int i=0; i<entries.count(); i++) {
-    QFileInfo fileInfo = entries.at(i);
+    for ( int i=0; i<entries.count(); i++) {
+        QFileInfo fileInfo = entries.at(i);
 
-    QString itemPath = fileInfo.absoluteFilePath();
-    QString relItemPath = itemPath.replace(absSourceFolder, "");
+        QString itemPath = fileInfo.absoluteFilePath();
+        QString relItemPath = itemPath.replace(absSourceFolder, "");
 
-    QString newItemPath = QString("%1/%2").arg(currentFolder).arg(relItemPath);
+        QString newItemPath = QString("%1/%2").arg(currentFolder).arg(relItemPath);
 
-    if ( fileInfo.isDir() == true ) {
-      dir.mkpath(newItemPath);
-      processStaticFolder(context, fileInfo.absoluteFilePath(), newItemPath);
+        if ( fileInfo.isDir() == true ) {
+            dir.mkpath(newItemPath);
+            processStaticFolder(context, fileInfo.absoluteFilePath(), newItemPath);
+        }
+        else if ( fileInfo.isFile() == true ) {
+            QFile::copy(fileInfo.absoluteFilePath(), newItemPath);
+        }
     }
-    else if ( fileInfo.isFile() == true ) {
-      QFile::copy(fileInfo.absoluteFilePath(), newItemPath);
-    }
-  }
 
-  return true;
+    return true;
 }
 
 bool xWebProcessor::processStaticFolder(xWebProcessContext& context, QString sourceFolder, QString outputFolder) {
-  QString currentFolder = sourceFolder;
+    QString currentFolder = sourceFolder;
 
-  QDir dir;
+    QDir dir;
 
-  QDir dir2(sourceFolder);
-  QFileInfoList entries = dir2.entryInfoList(QDir::AllEntries|QDir::NoDotAndDotDot);
+    QDir dir2(sourceFolder);
+    QFileInfoList entries = dir2.entryInfoList(QDir::AllEntries|QDir::NoDotAndDotDot);
 
-  QString absSourceFolder = dir2.absolutePath();
+    QString absSourceFolder = dir2.absolutePath();
 
-  for ( int i=0; i<entries.count(); i++) {
-    QFileInfo fileInfo = entries.at(i);
+    for ( int i=0; i<entries.count(); i++) {
+        QFileInfo fileInfo = entries.at(i);
 
-    QString itemPath = fileInfo.absoluteFilePath();
-    QString relItemPath = itemPath.replace(absSourceFolder, "");
+        QString itemPath = fileInfo.absoluteFilePath();
+        QString relItemPath = itemPath.replace(absSourceFolder, "");
 
-    QString newItemPath = QString("%1/%2").arg(outputFolder).arg(relItemPath);
+        QString newItemPath = QString("%1/%2").arg(outputFolder).arg(relItemPath);
 
-    if ( fileInfo.isDir() == true ) {
-      dir.mkpath(newItemPath);
-      processStaticFolder(context, fileInfo.absoluteFilePath(), newItemPath);
+        if ( fileInfo.isDir() == true ) {
+            dir.mkpath(newItemPath);
+            processStaticFolder(context, fileInfo.absoluteFilePath(), newItemPath);
+        }
+        else if ( fileInfo.isFile() == true ) {
+            QFile::copy(fileInfo.absoluteFilePath(), newItemPath);
+        }
     }
-    else if ( fileInfo.isFile() == true ) {
-      QFile::copy(fileInfo.absoluteFilePath(), newItemPath);
-    }
-  }
 
-  return true;
+    return true;
 }
 
 bool xWebProcessor::processFileItem(xWebProcessContext& context, xWebML::FileItemType& fileItem) {
 
-  xWebFileItemProcessor fileItemProcessor(fileItem);
-  fileItemProcessor.run(context);
+    xWebFileItemProcessor fileItemProcessor(fileItem);
+    fileItemProcessor.run(context);
 
-  return true;
+    return true;
 }
