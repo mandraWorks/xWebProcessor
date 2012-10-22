@@ -81,7 +81,7 @@ bool xWebProcessor::prepareOutputFolder(xWebProcessContext& context) {
 
     context.initCurrentFolder();
 
-    mandraworks::core::log::Log::error(QString("Outputfolder: %1").arg(context.currentFolder()));
+    mandraworks::core::log::Log::info(QString("Outputfolder: %1").arg(context.currentFolder()));
     mandraworks::core::log::Log::info(QString("Clean outputfolder..."));
 
     QString outputFolderPath = context.currentFolder();
