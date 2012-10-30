@@ -23,6 +23,8 @@ public:
     
     bool contains(QString key) const;
     QString stringForKey(QString key) const;
+
+    QList<QString> keys() const;
     
 private:
     QMap<QString,QString> _data;

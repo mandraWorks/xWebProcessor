@@ -54,3 +54,7 @@ QString xWebStringList::stringForKey(QString key) const {
     
     return _data[key];
 }
+
+QList<QString> xWebStringList::keys() const {
+    return _data.keys();
+}

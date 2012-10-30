@@ -91,6 +91,13 @@ bool xWebFileItemProcessor::runTransform(xWebProcessContext& context) {
     }
     
     ctemplate::TemplateDictionary dict("File");
+
+    for ( int i=0; i<context.getGlobalStrings()->keys().count(); i++) {
+        QString key = context.getGlobalStrings()->keys().at(i);
+        QString value = context.getGlobalStrings()->stringForKey(key);
+        dict.SetValue( key.toLocal8Bit().constData(), value.toLocal8Bit().constData());
+    }
+
     if ( context.getLocalStrings()->contains("BaseName")==true )
         dict.SetValue("BaseName", context.getLocalStrings()->stringForKey("BaseName").toLocal8Bit().constData());
     if ( context.getLocalStrings()->contains("Language")==true )
