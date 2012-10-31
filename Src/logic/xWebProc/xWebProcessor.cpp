@@ -40,7 +40,7 @@ bool xWebProcessor::run() {
     QFileInfo fileInfo(_projectFilePath);
     QDir schemaDir(fileInfo.absolutePath());
     if ( schemaDir.exists("Schemas") == true ) {
-        mandraworks::core::system::SystemLib::rmFolder(QString("%1/Schemas").arg(_projectFilePath));
+        mandraworks::core::system::SystemLib::rmFolder(QString("%1/Schemas").arg(fileInfo.absolutePath()));
     }
 
     schemaDir.mkdir("Schemas");

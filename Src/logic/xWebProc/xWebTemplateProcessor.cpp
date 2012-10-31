@@ -126,6 +126,15 @@ void xWebTemplateProcessor::processMenu(QString xmlData, QTextStream& outStream)
     QString templateFileName = QString(xmlMenu->TemplateFile().c_str());
     QString linkListFileName = QString(xmlMenu->LinkListFile().c_str());
 
+    QString subTemplateFileName;
+
+    if ( xmlMenu->SubTemplateFile().present() == true ) {
+      subTemplateFileName = QString(xmlMenu->SubTemplateFile().get().c_str());
+    }
+    else {
+      subTemplateFileName = templateFileName;
+    }
+
     QString linkListFile = _context->workingFolder();
     linkListFile.append("/");
     linkListFile.append(linkListFileName);
@@ -163,6 +172,14 @@ void xWebTemplateProcessor::processMenu(QString xmlData, QTextStream& outStream)
         dict.ShowSection("Img_Sec");
       }
 
+      if ( it->SubLinks().present() == true ) {
+        xWebML::LinkListType xmlSubLinkList = it->SubLinks().get();
+        QString subLinks;
+        processSubMenu(xmlSubLinkList, subTemplateFileName, subLinks);
+        dict.SetValue("SubLinks", subLinks.toLocal8Bit().constData());
+        dict.ShowSection("Sub_Sec");
+      }
+
       QString id = QString(it->ID().c_str());
 
       if ( (_context->activeMenuIDs().length() != 0) && (_context->activeMenuIDs().contains(id) == true ) )
@@ -182,6 +199,74 @@ void xWebTemplateProcessor::processMenu(QString xmlData, QTextStream& outStream)
     }
 
   } catch (const xml_schema::exception& ex) {
+    std::cout << ex << std::endl;
+    return;
+  }
+}
+
+void xWebTemplateProcessor::processSubMenu(xWebML::LinkListType& xmlSubLinks, QString templateFileName, QString& output) {
+  QTextStream stream(&output);
+  try {
+
+    QString templateFile = _context->workingFolder();
+    templateFile.append("/");
+    templateFile.append(templateFileName);
+
+    xWebML::LinkListType::LinkEntry_iterator it = xmlSubLinks.LinkEntry().begin();
+
+    ctemplate::TemplateDictionary dictLink("Link");
+    if ( _context->getLocalStrings()->contains("BaseName")==true )
+      dictLink.SetValue("BaseName", _context->getLocalStrings()->stringForKey("BaseName").toLocal8Bit().constData());
+    if ( _context->getLocalStrings()->contains("Language")==true )
+      dictLink.SetValue("Language", _context->getLocalStrings()->stringForKey("Language").toLocal8Bit().constData());
+
+    while ( it != xmlSubLinks.LinkEntry().end() ) {
+      ctemplate::TemplateDictionary dict("LinkEntry");
+
+      QString stringKey = QString(it->StringKey().c_str());
+      QString link = QString(it->Link().c_str());
+
+      ctemplate::Template* linkTpl = ctemplate::Template::StringToTemplate(link.toLocal8Bit().constData(), link.length(), ctemplate::DO_NOT_STRIP);
+
+      std::string linkOutput;
+      linkTpl->Expand(&linkOutput, &dictLink);
+
+      dict.SetValue("Link", linkOutput);
+      dict.SetValue("Label", _context->getContent(stringKey).toLocal8Bit().constData());
+
+      if ( it->Image().present() == true ) {
+        dict.SetValue("Image", it->Image().get().c_str());
+        dict.ShowSection("Img_Sec");
+      }
+
+      if ( it->SubLinks().present() == true ) {
+        xWebML::LinkListType xmlSubLinkList = it->SubLinks().get();
+        QString subLinks;
+        processSubMenu(xmlSubLinkList, templateFileName, subLinks);
+        dict.SetValue("SubLinks", subLinks.toLocal8Bit().constData());
+        dict.ShowSection("Sub_Sec");
+      }
+
+      QString id = QString(it->ID().c_str());
+
+      if ( (_context->activeMenuIDs().length() != 0) && (_context->activeMenuIDs().contains(id) == true ) )
+        dict.ShowSection("Act_Sec");
+
+      it++;
+
+      if ( it != xmlSubLinks.LinkEntry().end() )
+        dict.ShowSection("Sep_Sec");
+
+      ctemplate::Template* tpl = ctemplate::Template::GetTemplate(templateFile.toLocal8Bit().constData(), ctemplate::DO_NOT_STRIP);
+
+      std::string output;
+      tpl->Expand(&output, &dict);
+
+      stream << QString::fromUtf8(output.c_str()) << "\n";
+    }
+
+  }
+  catch (const xml_schema::exception& ex) {
     std::cout << ex << std::endl;
     return;
   }

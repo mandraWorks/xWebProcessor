@@ -9,6 +9,7 @@
 #include <QtCore>
 
 #include "xWebTemplateParser.h"
+#include "xWebMLLinkList.hxx"
 
 class xWebProcessContext;
 
@@ -22,6 +23,9 @@ public:
     void processContentLink(QString xmlData, QTextStream& outStream);
     void processContent(QString xmlData, QTextStream& outStream);
     void processMenu(QString xmlData, QTextStream& outStream);
+
+private:
+    void processSubMenu(xWebML::LinkListType& xmlSubLinks, QString templateFileName, QString& output);
     
 private:
     xWebProcessContext* _context;

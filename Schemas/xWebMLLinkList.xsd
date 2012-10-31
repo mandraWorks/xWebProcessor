@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2009 sp1 (http://www.altova.com) by Jean Plé (Symbios Orthopédie SA) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xWeb="http://www.pspsmartsoft.com/xWebML" targetNamespace="http://www.pspsmartsoft.com/xWebML">
 	<xs:complexType name="LinkEntryType">
 		<xs:sequence>
@@ -6,6 +7,7 @@
 			<xs:element name="Link" type="xs:string"/>
 			<xs:element name="Image" type="xs:string" minOccurs="0"/>
 			<xs:element name="StringKey" type="xs:string"/>
+			<xs:element name="SubLinks" type="xWeb:LinkListType" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="LinkListType">
