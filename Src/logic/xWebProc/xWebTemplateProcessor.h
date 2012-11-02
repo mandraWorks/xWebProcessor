@@ -23,6 +23,7 @@ public:
     void processContentLink(QString xmlData, QTextStream& outStream);
     void processContent(QString xmlData, QTextStream& outStream);
     void processMenu(QString xmlData, QTextStream& outStream);
+    void processIncludeFile(QString xmlData, QTextStream& outStream);
 
 private:
     void processSubMenu(xWebML::LinkListType& xmlSubLinks, QString templateFileName, QString& output);

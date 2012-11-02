@@ -10,48 +10,52 @@
 
 #include <QtCore>
 
+
 class xWebTemplateParserDelegate {
 public:
-    virtual void processString(QString xmlData, QTextStream& outStream) = 0;
-    virtual void processContentLink(QString xmlData, QTextStream& outStream) = 0;
-    virtual void processContent(QString xmlData, QTextStream& outStream) = 0;
-    virtual void processMenu(QString xmlData, QTextStream& outStream) = 0;
+  virtual void processString(QString xmlData, QTextStream& outStream) = 0;
+  virtual void processContentLink(QString xmlData, QTextStream& outStream) = 0;
+  virtual void processContent(QString xmlData, QTextStream& outStream) = 0;
+  virtual void processMenu(QString xmlData, QTextStream& outStream) = 0;
+  virtual void processIncludeFile(QString xmlData, QTextStream& outStream) = 0;
 };
 
 
 class xWebTemplateParser {
-    
-    enum Parser_State {
-      Idle,
-      InTag  
-    };
-    
-public:
-    xWebTemplateParser(QString inputFilePath, QString outputFilePath);
-    ~xWebTemplateParser();
-    
-    void setDelegate(xWebTemplateParserDelegate* delegate) { _delegate = delegate; }
 
-    bool run();
-    
+  enum Parser_State {
+    Idle,
+    InTag
+  };
+
+public:
+  xWebTemplateParser();
+  xWebTemplateParser(QString inputFilePath, QString outputFilePath);
+  ~xWebTemplateParser();
+
+  void setDelegate(xWebTemplateParserDelegate* delegate) { _delegate = delegate; }
+
+  void init();
+  bool run();
+  void parseLine(QString line, QTextStream& outStream);
+
 private:
-    void parseLine(QString line, QTextStream& outStream);
-    void processCurrentElement(QTextStream& outStream);
-    
-    QString getStartTag(QString tag);
-    QString getEndTag(QString tag);
-    
+  void processCurrentElement(QTextStream& outStream);
+
+  QString getStartTag(QString tag);
+  QString getEndTag(QString tag);
+
 private:
-    QString _inputFilePath;
-    QString _outputFilePath;
-    QStringList _xWebTags;
-    
-    int _parserState;
-    int _currentTagIndex;
-    
-    QString _currentElement;
-    
-    xWebTemplateParserDelegate* _delegate;
+  QString _inputFilePath;
+  QString _outputFilePath;
+  QStringList _xWebTags;
+
+  int _parserState;
+  int _currentTagIndex;
+
+  QString _currentElement;
+
+  xWebTemplateParserDelegate* _delegate;
 };
 
 #endif

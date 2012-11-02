@@ -204,6 +204,56 @@ void xWebTemplateProcessor::processMenu(QString xmlData, QTextStream& outStream)
   }
 }
 
+void xWebTemplateProcessor::processIncludeFile(QString xmlData, QTextStream& outStream) {
+  QString startTags = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+      "<xWeb:IncludeFile xmlns:xWeb=\"http://www.pspsmartsoft.com/xWebML\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.pspsmartsoft.com/xWebML Schemas/xWebMLTemplate.xsd\">";
+  QString xmlCompleteData = xmlData;
+
+  xmlCompleteData = xmlCompleteData.replace("<xWeb:IncludeFile>", startTags);
+
+  std::stringstream stream(xmlCompleteData.toLocal8Bit().constData());
+
+  try {
+    std::auto_ptr<xWebML::IncludeFileType> xmlIncludeFile = xWebML::IncludeFile(stream);
+
+    QString includeFileName = QString(xmlIncludeFile->File().c_str());
+
+    QString includeFilePath = _context->workingFolder();
+    includeFilePath.append("/");
+    includeFilePath.append(includeFileName);
+
+    QFile includeFile(includeFilePath);
+
+    if ( includeFile.exists() == false ) {
+      mandraworks::core::log::Log::error(QString(" Include file do not exists: %1").arg(includeFilePath));
+      return;
+    }
+
+    if ( includeFile.open(QIODevice::ReadOnly|QIODevice::Text) == false ) {
+      mandraworks::core::log::Log::error(QString(" Could not open include file: %1").arg(includeFilePath));
+      return;
+    }
+
+    QString line;
+    QTextStream includeStream(&includeFile);
+
+    xWebTemplateParser parser;
+    parser.setDelegate(this);
+    parser.init();
+
+    do {
+      line = includeStream.readLine();
+      parser.parseLine(line, outStream);
+    } while (!line.isNull());
+
+    includeFile.close();
+
+  } catch (const xml_schema::exception& ex) {
+    std::cout << ex << std::endl;
+    return;
+  }
+}
+
 void xWebTemplateProcessor::processSubMenu(xWebML::LinkListType& xmlSubLinks, QString templateFileName, QString& output) {
   QTextStream stream(&output);
   try {

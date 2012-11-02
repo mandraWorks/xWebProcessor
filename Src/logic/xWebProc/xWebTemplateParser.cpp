@@ -17,6 +17,20 @@
 #define CONTENTLINK     "xWeb:ContentLink"
 #define MENU            "xWeb:Menu"
 #define CONTENT         "xWeb:Content"
+#define INCLUDEFILE     "xWeb:IncludeFile"
+
+
+
+xWebTemplateParser::xWebTemplateParser() :
+  _delegate(0)
+{
+
+  _xWebTags.append(STRING);
+  _xWebTags.append(CONTENTLINK);
+  _xWebTags.append(CONTENT);
+  _xWebTags.append(MENU);
+  _xWebTags.append(INCLUDEFILE);
+}
 
 
 xWebTemplateParser::xWebTemplateParser(QString inputFilePath, QString outputFilePath) :
@@ -27,10 +41,16 @@ xWebTemplateParser::xWebTemplateParser(QString inputFilePath, QString outputFile
   _xWebTags.append(CONTENTLINK);
   _xWebTags.append(CONTENT);
   _xWebTags.append(MENU);
+  _xWebTags.append(INCLUDEFILE);
 }
 
 xWebTemplateParser::~xWebTemplateParser() {
 
+}
+
+void xWebTemplateParser::init() {
+  _parserState = Idle;
+  _currentElement.clear();
 }
 
 bool xWebTemplateParser::run() {
@@ -134,6 +154,10 @@ void xWebTemplateParser::processCurrentElement(QTextStream& outStream) {
   else if ( currentTag.compare(MENU) == 0 ) {
     if ( _delegate != 0 )
       _delegate->processMenu(_currentElement, outStream);
+  }
+  else if ( currentTag.compare(INCLUDEFILE) == 0 ) {
+    if ( _delegate != 0 )
+      _delegate->processIncludeFile(_currentElement, outStream);
   }
 }
 
