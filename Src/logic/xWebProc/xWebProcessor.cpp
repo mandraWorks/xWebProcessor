@@ -5,6 +5,7 @@
 //  Created by Matthias Müller on 02.05.11.
 //  Copyright 2011 Smartkinematics. All rights reserved.
 //
+#include <stream.h>
 #include <xsd/cxx/pre.hxx>
 #include "xWebMLProject.hxx"
 
@@ -54,7 +55,10 @@ bool xWebProcessor::run() {
     try {
         _projectFile = xWebML::xWebProject(_projectFilePath.toLocal8Bit().constData());
     } catch (const xml_schema::exception& ex) {
-        std::cout << ex << std::endl;
+      std::stringstream stream;
+      stream << ex;
+      QString str = QString::fromStdString(stream.str());
+      mandraworks::core::log::Log::error(QString("xml Parser error: %1").arg( str.replace("\n","")));
         return false;
     }
 
