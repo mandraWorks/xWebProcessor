@@ -52,3 +52,7 @@ include($${PWD}/Modules/07_install.pri)
 HEADERS += $${SRCPATH}/xWebProcessorDefs.h
 
 SOURCES += $${SRCPATH}/main.cpp
+
+macx {
+    QMAKE_CXXFLAGS += -fpermissive
+}
