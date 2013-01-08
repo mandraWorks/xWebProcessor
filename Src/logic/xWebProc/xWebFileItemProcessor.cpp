@@ -31,6 +31,9 @@ xWebFileItemProcessor::xWebFileItemProcessor(xWebML::FileItemType& fileItem) :
     _processingMethod   = QString(fileItem.ProcessingMethod().c_str());
     _sourceFilePath     = QString(fileItem.SourceFilePath().c_str());
     _targetFileName     = QString(fileItem.TargetFileName().c_str());
+
+    if ( fileItem.OutputFolder().present() == true )
+      _outputFolder = fileItem.OutputFolder().get().c_str();
     
     _contentPrefix.clear();
     
@@ -74,7 +77,16 @@ bool xWebFileItemProcessor::run(xWebProcessContext& context) {
 bool xWebFileItemProcessor::runTransform(xWebProcessContext& context) {
     initRun(context);
     
-    QString currentFolder = context.currentFolder();
+    QString currentFolder;
+    if ( _outputFolder.length() == 0 )
+      currentFolder = context.currentFolder();
+    else
+      currentFolder = QString("%1/%2").arg(QDir::currentPath()).arg(_outputFolder);
+
+    QDir dir(currentFolder);
+    if ( dir.exists() == false )
+      dir.mkpath(currentFolder);
+
     QString targetFile = QString("%1/%2").arg(currentFolder).arg(_targetFileName);
     
     mandraworks::core::log::Log::info(QString("Generate file: %1").arg(targetFile));

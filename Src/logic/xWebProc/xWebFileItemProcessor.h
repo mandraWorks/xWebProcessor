@@ -32,6 +32,7 @@ private:
 private:
     QString _processingMethod;
     QString _sourceFilePath;
+    QString _outputFolder;
     QString _targetFileName;
     QString _contentPrefix;
     QStringList  _activeMenuIDs;
