@@ -170,7 +170,11 @@ bool xWebProcessor::processStaticFolder(xWebProcessContext& context, xWebML::Sta
     QString folderName = QString(staticFolder.Name().c_str());
     QString currentFolder = QString("%1/%2").arg(context.currentFolder()).arg(folderName);
 
-    QDir dir;
+    QDir dir(currentFolder);
+
+    if ( dir.exists())
+      mandraworks::core::system::SystemLib::rmFolder(currentFolder);
+
     dir.mkpath(currentFolder);
 
     QString sourceFolder = QString(staticFolder.SourceFolder().c_str());
