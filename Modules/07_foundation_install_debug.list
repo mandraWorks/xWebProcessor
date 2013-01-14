@@ -7,6 +7,16 @@ libMwCmd_debug.0.dylib libMwCmd_debug.0.dylib $MW_COMMON/Libraries/lib/
 /usr/local/Trolltech/Qt-4.8.1/lib/QtCore.framework/Versions/4/QtCore                  QtCore         /usr/local/Trolltech/Qt-4.8.1/lib/QtCore.framework/Versions/4
 /usr/local/Trolltech/Qt-4.8.1/lib/QtGui.framework/Versions/4/QtGui                    QtGui          /usr/local/Trolltech/Qt-4.8.1/lib/QtGui.framework/Versions/4
 /usr/local/Trolltech/Qt-4.8.1/lib/QtXml.framework/Versions/4/QtXml                    QtXml          /usr/local/Trolltech/Qt-4.8.1/lib/QtXml.framework/Versions/4
+/usr/local/Trolltech/Qt-4.8.1/lib/QtOpenGL.framework/Versions/4/QtOpenGL              QtOpenGL       /usr/local/Trolltech/Qt-4.8.1/lib/QtOpenGL.framework/Versions/4
+/usr/local/Trolltech/Qt-4.8.1/lib/QtNetwork.framework/Versions/4/QtNetwork            QtNetwork      /usr/local/Trolltech/Qt-4.8.1/lib/QtNetwork.framework/Versions/4
+/usr/local/Trolltech/Qt-4.8.1/lib/QtXmlPatterns.framework/Versions/4/QtXmlPatterns    QtXmlPatterns  /usr/local/Trolltech/Qt-4.8.1/lib/QtXmlPatterns.framework/Versions/4
+/usr/local/Trolltech/Qt-4.8.1/lib/QtSql.framework/Versions/4/QtSql                    QtSql          /usr/local/Trolltech/Qt-4.8.1/lib/QtSql.framework/Versions/4
+/usr/local/Trolltech/Qt-4.8.1/lib/QtSvg.framework/Versions/4/QtSvg                    QtSvg          /usr/local/Trolltech/Qt-4.8.1/lib/QtSvg.framework/Versions/4
+/usr/local/Trolltech/Qt-4.8.1/lib/Qt3Support.framework/Versions/4/Qt3Support          Qt3Support     /usr/local/Trolltech/Qt-4.8.1/lib/Qt3Support.framework/Versions/4
+/usr/local/Trolltech/Qt-4.8.1/lib/QtWebKit.framework/Versions/4/QtWebKit              QtWebKit       /usr/local/Trolltech/Qt-4.8.1/lib/QtWebKit.framework/Versions/4
+/usr/local/Trolltech/Qt-4.8.1/lib/QtDBus.framework/Versions/4/QtDBus                  QtDBus         /usr/local/Trolltech/Qt-4.8.1/lib/QtDBus.framework/Versions/4
+/usr/local/Trolltech/Qt-4.8.1/lib/QtDBus.framework/Versions/4/QtXmlPatterns           QtXmlPatterns  /usr/local/Trolltech/Qt-4.8.1/lib/QtXmlPatterns.framework/Versions/4
+/usr/local/Trolltech/Qt-4.8.1/lib/phonon.framework/Versions/4/phonon                  phonon         /usr/local/Trolltech/Qt-4.8.1/lib/phonon.framework/Versions/4
 
 
 #ctemplate
