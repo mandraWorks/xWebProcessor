@@ -6,7 +6,7 @@ QT       += core xml
 
 CONFIG +=console
 
-CONFIG   -= app_bundle
+#CONFIG   -= app_bundle
 
 TMPDIR = $${PWD}/tmp
 

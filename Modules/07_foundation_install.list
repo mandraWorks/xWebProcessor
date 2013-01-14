@@ -1,0 +1,17 @@
+#Mw framwork
+libMwCore.0.dylib libMwCore.0.dylib $MW_COMMON/Libraries/lib/
+libMwCmd.0.dylib libMwCmd.0.dylib $MW_COMMON/Libraries/lib/
+
+
+#Qt
+/usr/local/Trolltech/Qt-4.8.1/lib/QtCore.framework/Versions/4/QtCore                  QtCore         /usr/local/Trolltech/Qt-4.8.1/lib/QtCore.framework/Versions/4
+/usr/local/Trolltech/Qt-4.8.1/lib/QtGui.framework/Versions/4/QtGui                    QtGui          /usr/local/Trolltech/Qt-4.8.1/lib/QtGui.framework/Versions/4
+/usr/local/Trolltech/Qt-4.8.1/lib/QtXml.framework/Versions/4/QtXml                    QtXml          /usr/local/Trolltech/Qt-4.8.1/lib/QtXml.framework/Versions/4
+
+
+#ctemplate
+$MW_COMMON/Libraries/lib/libxerces-c-3.1.dylib libxerces-c-3.1.dylib $MW_COMMON/Libraries/lib/
+
+
+#xecers-c
+$MW_COMMON/Libraries/lib/libctemplate.2.dylib libctemplate.2.dylib $MW_COMMON/Libraries/lib/
