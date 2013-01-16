@@ -103,7 +103,7 @@ void xWebTemplateParser::parseLine(QString line, QTextStream& outStream) {
 
         int index = line.indexOf(startTag);
 
-        outStream << line.mid(0, index) << "\n";
+        outStream << line.mid(0, index);
 
         line = line.mid(index);
 

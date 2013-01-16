@@ -27,6 +27,8 @@ public:
 
 private:
     void processSubMenu(xWebML::LinkListType& xmlSubLinks, QString templateFileName, QString& output);
+
+    void logException(const xml_schema::exception& ex);
     
 private:
     xWebProcessContext* _context;

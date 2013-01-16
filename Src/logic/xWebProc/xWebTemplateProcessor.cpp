@@ -50,7 +50,7 @@ void xWebTemplateProcessor::processString(QString xmlData, QTextStream& outStrea
     outStream << _context->getString(key);
 
   } catch (const xml_schema::exception& ex) {
-    std::cout << ex << std::endl;
+    logException(ex);
     return;
   }
 }
@@ -81,7 +81,7 @@ void xWebTemplateProcessor::processContentLink(QString xmlData, QTextStream& out
     _context->setCurrentContent(*content);
 
   } catch (const xml_schema::exception& ex) {
-    std::cout << ex << std::endl;
+    logException(ex);
     return;
   }
 
@@ -105,7 +105,7 @@ void xWebTemplateProcessor::processContent(QString xmlData, QTextStream& outStre
     outStream << content;
 
   } catch (const xml_schema::exception& ex) {
-    std::cout << ex << std::endl;
+    logException(ex);
     return;
   }
 }
@@ -199,7 +199,7 @@ void xWebTemplateProcessor::processMenu(QString xmlData, QTextStream& outStream)
     }
 
   } catch (const xml_schema::exception& ex) {
-    std::cout << ex << std::endl;
+    logException(ex);
     return;
   }
 }
@@ -249,7 +249,7 @@ void xWebTemplateProcessor::processIncludeFile(QString xmlData, QTextStream& out
     includeFile.close();
 
   } catch (const xml_schema::exception& ex) {
-    std::cout << ex << std::endl;
+    logException(ex);
     return;
   }
 }
@@ -317,7 +317,18 @@ void xWebTemplateProcessor::processSubMenu(xWebML::LinkListType& xmlSubLinks, QS
 
   }
   catch (const xml_schema::exception& ex) {
-    std::cout << ex << std::endl;
+    logException(ex);
     return;
+  }
+}
+
+
+void xWebTemplateProcessor::logException(const xml_schema::exception& ex) {
+  std::stringstream stream;
+  stream << ex;
+  QString str = QString::fromStdString(stream.str());
+  QStringList lines = str.split("\n");
+  foreach( QString line, lines ) {
+    mandraworks::core::log::Log::error(line);
   }
 }
