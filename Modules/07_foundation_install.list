@@ -4,19 +4,19 @@ libMwCmd.0.dylib libMwCmd.0.dylib $MW_COMMON/Libraries/lib/
 
 
 #Qt
-/usr/local/Trolltech/Qt-4.8.1/lib/QtCore.framework/Versions/4/QtCore                  QtCore         /usr/local/Trolltech/Qt-4.8.1/lib/QtCore.framework/Versions/4
-/usr/local/Trolltech/Qt-4.8.1/lib/QtGui.framework/Versions/4/QtGui                    QtGui          /usr/local/Trolltech/Qt-4.8.1/lib/QtGui.framework/Versions/4
-/usr/local/Trolltech/Qt-4.8.1/lib/QtXml.framework/Versions/4/QtXml                    QtXml          /usr/local/Trolltech/Qt-4.8.1/lib/QtXml.framework/Versions/4
-/usr/local/Trolltech/Qt-4.8.1/lib/QtOpenGL.framework/Versions/4/QtOpenGL              QtOpenGL       /usr/local/Trolltech/Qt-4.8.1/lib/QtOpenGL.framework/Versions/4
-/usr/local/Trolltech/Qt-4.8.1/lib/QtNetwork.framework/Versions/4/QtNetwork            QtNetwork      /usr/local/Trolltech/Qt-4.8.1/lib/QtNetwork.framework/Versions/4
-/usr/local/Trolltech/Qt-4.8.1/lib/QtXmlPatterns.framework/Versions/4/QtXmlPatterns    QtXmlPatterns  /usr/local/Trolltech/Qt-4.8.1/lib/QtXmlPatterns.framework/Versions/4
-/usr/local/Trolltech/Qt-4.8.1/lib/QtSql.framework/Versions/4/QtSql                    QtSql          /usr/local/Trolltech/Qt-4.8.1/lib/QtSql.framework/Versions/4
-/usr/local/Trolltech/Qt-4.8.1/lib/QtSvg.framework/Versions/4/QtSvg                    QtSvg          /usr/local/Trolltech/Qt-4.8.1/lib/QtSvg.framework/Versions/4
-/usr/local/Trolltech/Qt-4.8.1/lib/Qt3Support.framework/Versions/4/Qt3Support          Qt3Support     /usr/local/Trolltech/Qt-4.8.1/lib/Qt3Support.framework/Versions/4
-/usr/local/Trolltech/Qt-4.8.1/lib/QtWebKit.framework/Versions/4/QtWebKit              QtWebKit       /usr/local/Trolltech/Qt-4.8.1/lib/QtWebKit.framework/Versions/4
-/usr/local/Trolltech/Qt-4.8.1/lib/QtDBus.framework/Versions/4/QtDBus                  QtDBus         /usr/local/Trolltech/Qt-4.8.1/lib/QtDBus.framework/Versions/4
-/usr/local/Trolltech/Qt-4.8.1/lib/QtDBus.framework/Versions/4/QtXmlPatterns           QtXmlPatterns  /usr/local/Trolltech/Qt-4.8.1/lib/QtXmlPatterns.framework/Versions/4
-/usr/local/Trolltech/Qt-4.8.1/lib/phonon.framework/Versions/4/phonon                  phonon         /usr/local/Trolltech/Qt-4.8.1/lib/phonon.framework/Versions/4
+/usr/local/Trolltech/Qt-4.8.3/lib/QtCore.framework/Versions/4/QtCore                  QtCore         /usr/local/Trolltech/Qt-4.8.3/lib/QtCore.framework
+/usr/local/Trolltech/Qt-4.8.3/lib/QtGui.framework/Versions/4/QtGui                    QtGui          /usr/local/Trolltech/Qt-4.8.3/lib/QtGui.framework
+/usr/local/Trolltech/Qt-4.8.3/lib/QtXml.framework/Versions/4/QtXml                    QtXml          /usr/local/Trolltech/Qt-4.8.3/lib/QtXml.framework
+/usr/local/Trolltech/Qt-4.8.3/lib/QtOpenGL.framework/Versions/4/QtOpenGL              QtOpenGL       /usr/local/Trolltech/Qt-4.8.3/lib/QtOpenGL.framework
+/usr/local/Trolltech/Qt-4.8.3/lib/QtNetwork.framework/Versions/4/QtNetwork            QtNetwork      /usr/local/Trolltech/Qt-4.8.3/lib/QtNetwork.framework
+/usr/local/Trolltech/Qt-4.8.3/lib/QtXmlPatterns.framework/Versions/4/QtXmlPatterns    QtXmlPatterns  /usr/local/Trolltech/Qt-4.8.3/lib/QtXmlPatterns.framework
+/usr/local/Trolltech/Qt-4.8.3/lib/QtSql.framework/Versions/4/QtSql                    QtSql          /usr/local/Trolltech/Qt-4.8.3/lib/QtSql.framework
+/usr/local/Trolltech/Qt-4.8.3/lib/QtSvg.framework/Versions/4/QtSvg                    QtSvg          /usr/local/Trolltech/Qt-4.8.3/lib/QtSvg.framework
+/usr/local/Trolltech/Qt-4.8.3/lib/Qt3Support.framework/Versions/4/Qt3Support          Qt3Support     /usr/local/Trolltech/Qt-4.8.3/lib/Qt3Support.framework
+/usr/local/Trolltech/Qt-4.8.3/lib/QtWebKit.framework/Versions/4/QtWebKit              QtWebKit       /usr/local/Trolltech/Qt-4.8.3/lib/QtWebKit.framework
+/usr/local/Trolltech/Qt-4.8.3/lib/QtDBus.framework/Versions/4/QtDBus                  QtDBus         /usr/local/Trolltech/Qt-4.8.3/lib/QtDBus.framework
+/usr/local/Trolltech/Qt-4.8.3/lib/QtDBus.framework/Versions/4/QtXmlPatterns           QtXmlPatterns  /usr/local/Trolltech/Qt-4.8.3/lib/QtXmlPatterns.framework
+/usr/local/Trolltech/Qt-4.8.3/lib/phonon.framework/Versions/4/phonon                  phonon         /usr/local/Trolltech/Qt-4.8.3/lib/phonon.framework/Versions/4
 
 #ctemplate
 $MW_COMMON/Libraries/lib/libxerces-c-3.1.dylib libxerces-c-3.1.dylib $MW_COMMON/Libraries/lib/
