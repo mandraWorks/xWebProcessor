@@ -35,6 +35,13 @@ xWebProcessContext::~xWebProcessContext() {
     delete _content;
 }
 
+void xWebProcessContext::setCurrentContent(QString contentFile) {
+  if ( _content == 0 )
+    _content = new xWebStringList(contentFile);
+  else
+    _content->init(contentFile);
+}
+
 void xWebProcessContext::setCurrentContent(xWebML::StringListType& list) {
   if ( _content == 0 )
     _content = new xWebStringList(list);

@@ -20,6 +20,7 @@ public:
   ~xWebProcessContext();
 
   void setLocalStrings(xWebStringList* list) { _localStrings = list; }
+  void setCurrentContent(QString contentFile);
   void setCurrentContent(xWebML::StringListType& list);
   void setContentPrefix(QString str);
   void setActiveMenuIDs(QStringList array);

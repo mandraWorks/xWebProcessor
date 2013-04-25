@@ -76,9 +76,7 @@ void xWebTemplateProcessor::processContentLink(QString xmlData, QTextStream& out
     contentFileName.append(_context->contentPrefix());
     contentFileName.append(fileName);
 
-    std::auto_ptr<xWebML::StringListType> content = xWebML::StringList(contentFileName.toLocal8Bit().constData());
-
-    _context->setCurrentContent(*content);
+    _context->setCurrentContent(contentFileName);
 
   } catch (const xml_schema::exception& ex) {
     logException(ex);

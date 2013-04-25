@@ -16,9 +16,11 @@ namespace xWebML {
 class xWebStringList {
   
 public:
+  xWebStringList(QString contentFile);
     xWebStringList(xWebML::StringListType& list);
     ~xWebStringList();
     
+    void init(QString contentFile);
     void init(xWebML::StringListType& list);
     
     bool contains(QString key) const;
