@@ -61,6 +61,10 @@ void xWebStringsParser::processAssignment() {
   if ( _currentState == BeforeAssignemet ) {
     _currentState = AfterAssignemet;
   }
+  else if(_currentState == InValue)
+  {
+    _currentValue += _currentChar;
+  }
 }
 
 void xWebStringsParser::processSemicolon() {

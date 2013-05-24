@@ -44,6 +44,8 @@ public:
 
   QString currentFolder();
 
+  QString expandTemplate(QString templ);
+
 private:
   QString _outputFolder;
   QStringList  _currentFolder;

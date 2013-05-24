@@ -2,7 +2,7 @@
 TEMPLATE = app
 LANGUAGE = C++
 
-QT       += core xml
+QT       += core xml network
 
 CONFIG +=console
 

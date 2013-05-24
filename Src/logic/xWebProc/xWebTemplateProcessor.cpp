@@ -215,6 +215,7 @@ void xWebTemplateProcessor::processIncludeFile(QString xmlData, QTextStream& out
     std::auto_ptr<xWebML::IncludeFileType> xmlIncludeFile = xWebML::IncludeFile(stream);
 
     QString includeFileName = QString(xmlIncludeFile->File().c_str());
+    includeFileName = _context->expandTemplate(includeFileName);
 
     QString includeFilePath = _context->workingFolder();
     includeFilePath.append("/");

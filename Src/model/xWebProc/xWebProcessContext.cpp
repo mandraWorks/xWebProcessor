@@ -7,6 +7,7 @@
 //
 
 #include <xsd/cxx/pre.hxx>
+#include <ctemplate/template.h>
 
 #include "xWebMLProject.hxx"
 
@@ -111,4 +112,37 @@ void xWebProcessContext::dequeueFolder() {
 
 QString xWebProcessContext::currentFolder() {    
   return _currentFolder.last();
+}
+
+QString xWebProcessContext::expandTemplate(QString templ) {
+  ctemplate::TemplateDictionary dict("File");
+
+  for ( int i=0; i<getGlobalStrings()->keys().count(); i++) {
+      QString key = getGlobalStrings()->keys().at(i);
+      QString value = getGlobalStrings()->stringForKey(key);
+      dict.SetValue( key.toLocal8Bit().constData(), value.toLocal8Bit().constData());
+  }
+
+  if ( getLocalStrings()->contains("BaseName")==true )
+      dict.SetValue("BaseName", getLocalStrings()->stringForKey("BaseName").toLocal8Bit().constData());
+  if ( getLocalStrings()->contains("Language")==true )
+      dict.SetValue("Language", getLocalStrings()->stringForKey("Language").toLocal8Bit().constData());
+
+  time_t rawtime;
+  struct tm * timeinfo;
+
+  time( &rawtime);
+  timeinfo = localtime(&rawtime);
+
+  char buffer[80];
+  strftime(buffer, 80, "%H:%M:%S %d.%m.%Y", timeinfo);
+
+  dict.SetValue("CurrentTime", buffer);
+
+  ctemplate::Template* tpl = ctemplate::Template::StringToTemplate(templ.toLocal8Bit().constData(), ctemplate::DO_NOT_STRIP);
+
+  std::string output;
+  tpl->Expand(&output, &dict);
+
+  return QString::fromStdString(output);
 }
