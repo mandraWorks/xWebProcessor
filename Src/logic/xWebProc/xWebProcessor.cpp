@@ -31,6 +31,10 @@ void xWebProcessor::setProjectFilePath(QString path) {
     _projectFilePath = path;
 }
 
+void xWebProcessor::setProjectFilePath(std::string path) {
+    _projectFilePath = QString::fromStdString(path);
+}
+
 bool xWebProcessor::run() {
     if ( QFile::exists(_projectFilePath) == false ) {
         mandraworks::core::log::Log::error(QString("Project file do not exists: %1").arg(_projectFilePath));

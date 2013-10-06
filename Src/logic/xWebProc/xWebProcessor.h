@@ -26,6 +26,7 @@ public:
     ~xWebProcessor();
     
     void setProjectFilePath(QString path);
+    void setProjectFilePath(std::string path);
     
     bool run();
     

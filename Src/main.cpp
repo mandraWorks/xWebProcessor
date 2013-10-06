@@ -11,7 +11,6 @@
 
 #include <string>
 #include <boost/program_options.hpp>
-//#include "mandraworks/cmd/CommandLineParser.h"
 
 #include "xWebProcessorDefs.h"
 #include "app/common/ApplicationEnvironment.h"
@@ -53,22 +52,25 @@ int main ( int argc, char **argv )
         // Declare the supported options.
         boost::program_options::options_description desc("Allowed options");
         desc.add_options()
-            ("help", "xWebProcessor v")
-            ("projectfile", boost::program_options::value<std::string>(), "Sepcify project file")
-        ;
-      //mandraworks::core::cmd::CommandLineParser<CommandLineParams> parser;
+                ("help", "shows the help for the program options")
+                ("projectfile", boost::program_options::value<std::string>(), "Sepcify project file")
+                ;
 
-      //parser.parse(app.arguments());
+        boost::program_options::variables_map vm;
+        boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), vm);
+        boost::program_options::notify(vm);
 
-      /*if ( parser.exists(CommandLineParams::ProjectFile) ) {
-        QString projectFile = parser.value(CommandLineParams::ProjectFile);
+        if (vm.count("help")) {
+            std::cout << desc << "\n";
+        }
+        else if ( vm.count("projectfile")) {
+            std::string projectfile = vm["projectfile"].as<std::string>();
 
-        xWebProcessor processor;
+            xWebProcessor processor;
 
-        processor.setProjectFilePath(projectFile);
-        processor.run();
-      }*/
-
+            processor.setProjectFilePath(projectfile);
+            processor.run();
+        }
 
     }
     catch(const std::exception &e){
