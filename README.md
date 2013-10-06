@@ -9,3 +9,4 @@ Requirerments
 =============
 
 - boost 1.54.0
+- ctemplate 2.2
