@@ -9,8 +9,9 @@
 #include "mandraworks/core/Log/LogFormaterSSV.h"
 #include "mandraworks/core/Log/LogFormaterSerial.h"
 
-
-#include "mandraworks/cmd/CommandLineParser.h"
+#include <string>
+#include <boost/program_options.hpp>
+//#include "mandraworks/cmd/CommandLineParser.h"
 
 #include "xWebProcessorDefs.h"
 #include "app/common/ApplicationEnvironment.h"
@@ -49,18 +50,24 @@ int main ( int argc, char **argv )
     QCoreApplication app(argc, argv);
 
     try{
-      mandraworks::core::cmd::CommandLineParser<CommandLineParams> parser;
+        // Declare the supported options.
+        boost::program_options::options_description desc("Allowed options");
+        desc.add_options()
+            ("help", "xWebProcessor v")
+            ("projectfile", boost::program_options::value<std::string>(), "Sepcify project file")
+        ;
+      //mandraworks::core::cmd::CommandLineParser<CommandLineParams> parser;
 
-      parser.parse(app.arguments());
+      //parser.parse(app.arguments());
 
-      if ( parser.exists(CommandLineParams::ProjectFile) ) {
+      /*if ( parser.exists(CommandLineParams::ProjectFile) ) {
         QString projectFile = parser.value(CommandLineParams::ProjectFile);
 
         xWebProcessor processor;
 
         processor.setProjectFilePath(projectFile);
         processor.run();
-      }
+      }*/
 
 
     }
