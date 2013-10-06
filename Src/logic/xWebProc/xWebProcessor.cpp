@@ -7,12 +7,11 @@
 //
 #include <stream.h>
 #include <xsd/cxx/pre.hxx>
+#include <boost/filesystem.hpp>
+
 #include "xWebMLProject.hxx"
 
 #include "xWebProcessor.h"
-
-#include "mandraworks/core/log/Log.h"
-#include "mandraworks/core/system/SystemLib.h"
 
 #include "model/xWebProc/xWebProcessContext.h"
 #include "logic/xWebProc/xWebFileItemProcessor.h"
@@ -37,7 +36,7 @@ void xWebProcessor::setProjectFilePath(std::string path) {
 
 bool xWebProcessor::run() {
     if ( QFile::exists(_projectFilePath) == false ) {
-        mandraworks::core::log::Log::error(QString("Project file do not exists: %1").arg(_projectFilePath));
+        std::cout << "Project file do not exists: " << _projectFilePath.toLocal8Bit().constData() << std::endl;
         return false;
     }
 
@@ -45,7 +44,8 @@ bool xWebProcessor::run() {
     QFileInfo fileInfo(_projectFilePath);
     QDir schemaDir(fileInfo.absolutePath());
     if ( schemaDir.exists("Schemas") == true ) {
-        mandraworks::core::system::SystemLib::rmFolder(QString("%1/Schemas").arg(fileInfo.absolutePath()));
+        QString folder = QString("%1/Schemas").arg(fileInfo.absolutePath());
+        boost::filesystem::remove_all(folder.toLocal8Bit().constData());
     }
 
     schemaDir.mkdir("Schemas");
@@ -59,10 +59,11 @@ bool xWebProcessor::run() {
     try {
         _projectFile = xWebML::xWebProject(_projectFilePath.toLocal8Bit().constData());
     } catch (const xml_schema::exception& ex) {
-      std::stringstream stream;
-      stream << ex;
-      QString str = QString::fromStdString(stream.str());
-      mandraworks::core::log::Log::error(QString("xml Parser error: %1").arg( str.replace("\n","")));
+        std::stringstream stream;
+        stream << ex;
+        QString str = QString::fromStdString(stream.str());
+        QString str2 = str.replace("\n","");
+        std::cout << "xml Parser error: " << str2.toLocal8Bit().constData() << std::endl;
         return false;
     }
 
@@ -70,27 +71,26 @@ bool xWebProcessor::run() {
     xWebProcessContext context(_projectFile->Settings());
 
     if ( prepareOutputFolder(context) == false ) {
-        mandraworks::core::log::Log::error(QString("Prepare output folder faild: %1").arg(_projectFilePath));
+        std::cout << "Prepare output folder faild: " << _projectFilePath.toLocal8Bit().constData() << std::endl;
         return false;
     }
 
     if ( processContent(context, _projectFile->Content()) == false ) {
-        mandraworks::core::log::Log::error(QString("Process content faild: %1").arg(_projectFilePath));
+        std::cout << "Process content faild: " << _projectFilePath.toLocal8Bit().constData() << std::endl;
         return false;
     }
 
-    mandraworks::core::log::Log::info(QString("xWebProcessor succedded"));
+    std::cout << "xWebProcessor succedded" << std::endl;
 
     return true;
 }
 
 bool xWebProcessor::prepareOutputFolder(xWebProcessContext& context) {
-    mandraworks::core::log::Log::info(QString("Prepare outputfolder"));
+    std::cout << "Prepare outputfolder" << std::endl;
 
     context.initCurrentFolder();
 
-    mandraworks::core::log::Log::info(QString("Outputfolder: %1").arg(context.currentFolder()));
-    //mandraworks::core::log::Log::info(QString("Clean outputfolder..."));
+    std::cout << "Outputfolder: " << context.currentFolder().toLocal8Bit().constData() << std::endl;
 
     QString outputFolderPath = context.currentFolder();
 
@@ -99,7 +99,7 @@ bool xWebProcessor::prepareOutputFolder(xWebProcessContext& context) {
     QDir dir(outputFolderPath);
 
     if ( dir.exists() == false )
-      dir.mkpath(outputFolderPath);
+        dir.mkpath(outputFolderPath);
 
     return true;
 }
@@ -177,7 +177,7 @@ bool xWebProcessor::processStaticFolder(xWebProcessContext& context, xWebML::Sta
     QDir dir(currentFolder);
 
     if ( dir.exists())
-      mandraworks::core::system::SystemLib::rmFolder(currentFolder);
+        boost::filesystem::remove_all(currentFolder.toLocal8Bit().constData());
 
     dir.mkpath(currentFolder);
 

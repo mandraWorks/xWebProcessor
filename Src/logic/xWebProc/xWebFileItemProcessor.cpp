@@ -17,8 +17,6 @@
 
 #include "xWebFileItemProcessor.h"
 
-#include "mandraworks/core/log/Log.h"
-
 #include "model/xWebProc/xWebProcessContext.h"
 #include "model/xWebProc/xWebStringList.h"
 #include "logic/xWebProc/xWebTemplateParser.h"
@@ -89,7 +87,7 @@ bool xWebFileItemProcessor::runTransform(xWebProcessContext& context) {
 
     QString targetFile = QString("%1/%2").arg(currentFolder).arg(_targetFileName);
     
-    mandraworks::core::log::Log::info(QString("Generate file: %1").arg(targetFile));
+    std::cout << "Generate file: " << targetFile.toLocal8Bit().constData() << std::endl;
     
     QString absSourceFilePath = QString("%1/%2").arg(context.workingFolder()).arg(_sourceFilePath);
     

@@ -14,7 +14,6 @@
 #include <iostream>
 
 #include "xWebProcessContext.h"
-#include "mandraworks/core/log/Log.h"
 #include "model/xWebProc/xWebStringList.h"
 
 
@@ -101,7 +100,7 @@ void xWebProcessContext::enqueueFolder(QString folder) {
   QDir dir;
   dir.mkpath(newFolderPath);
 
-  mandraworks::core::log::Log::info(QString("New folder: %1").arg(newFolderPath));
+  std::cout << "New folder: " << newFolderPath.toLocal8Bit().constData() << std::endl;
 
   _currentFolder.append(newFolderPath);
 }
