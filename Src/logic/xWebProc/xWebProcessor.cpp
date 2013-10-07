@@ -26,44 +26,38 @@ xWebProcessor::xWebProcessor()
 xWebProcessor::~xWebProcessor() {
 }
 
-void xWebProcessor::setProjectFilePath(QString path) {
+void xWebProcessor::setProjectFilePath(std::string path) {
     _projectFilePath = path;
 }
 
-void xWebProcessor::setProjectFilePath(std::string path) {
-    _projectFilePath = QString::fromStdString(path);
-}
-
 bool xWebProcessor::run() {
-    if ( QFile::exists(_projectFilePath) == false ) {
-        std::cout << "Project file do not exists: " << _projectFilePath.toLocal8Bit().constData() << std::endl;
+    if ( boost::filesystem::exists(_projectFilePath) == false ) {
+        std::cout << "Project file do not exists: " << _projectFilePath << std::endl;
         return false;
     }
 
     // deploy schemas
-    QFileInfo fileInfo(_projectFilePath);
-    QDir schemaDir(fileInfo.absolutePath());
-    if ( schemaDir.exists("Schemas") == true ) {
-        QString folder = QString("%1/Schemas").arg(fileInfo.absolutePath());
-        boost::filesystem::remove_all(folder.toLocal8Bit().constData());
+    boost::filesystem::path fileInfo(_projectFilePath);
+    boost::filesystem::path schemapath = fileInfo.parent_path();
+    schemapath /= "Schemas";
+    if ( boost::filesystem::exists(schemapath) == true ) {
+        std::cout << "Empty schema folder: " << schemapath << std::endl;
+        boost::filesystem::remove_all(schemapath);
     }
 
-    schemaDir.mkdir("Schemas");
-    schemaDir.cd("Schemas");
 
-    QFile::copy(":/xWebMLStringList.xsd", QString("%1/xWebMLStringList.xsd").arg(schemaDir.absolutePath()));
-    QFile::copy(":/xWebMLProject.xsd", QString("%1/xWebMLProject.xsd").arg(schemaDir.absolutePath()));
-    QFile::copy(":/xWebMLTemplate.xsd", QString("%1/xWebMLTemplate.xsd").arg(schemaDir.absolutePath()));
-    QFile::copy(":/xWebMLLinkList.xsd", QString("%1/xWebMLLinkList.xsd").arg(schemaDir.absolutePath()));
+    boost::filesystem::create_directory( schemapath);
+
+    //QFile::copy(":/xWebMLStringList.xsd", QString("%1/xWebMLStringList.xsd").arg(schemaDir.absolutePath()));
+    //QFile::copy(":/xWebMLProject.xsd", QString("%1/xWebMLProject.xsd").arg(schemaDir.absolutePath()));
+    //QFile::copy(":/xWebMLTemplate.xsd", QString("%1/xWebMLTemplate.xsd").arg(schemaDir.absolutePath()));
+    //QFile::copy(":/xWebMLLinkList.xsd", QString("%1/xWebMLLinkList.xsd").arg(schemaDir.absolutePath()));
 
     try {
-        _projectFile = xWebML::xWebProject(_projectFilePath.toLocal8Bit().constData());
+        _projectFile = xWebML::xWebProject(_projectFilePath);
     } catch (const xml_schema::exception& ex) {
-        std::stringstream stream;
-        stream << ex;
-        QString str = QString::fromStdString(stream.str());
-        QString str2 = str.replace("\n","");
-        std::cout << "xml Parser error: " << str2.toLocal8Bit().constData() << std::endl;
+        std::cout << "xml Parser error: ";
+        std::cout << ex << std::endl;
         return false;
     }
 
@@ -71,12 +65,12 @@ bool xWebProcessor::run() {
     xWebProcessContext context(_projectFile->Settings());
 
     if ( prepareOutputFolder(context) == false ) {
-        std::cout << "Prepare output folder faild: " << _projectFilePath.toLocal8Bit().constData() << std::endl;
+        std::cout << "Prepare output folder faild: " << _projectFilePath<< std::endl;
         return false;
     }
 
     if ( processContent(context, _projectFile->Content()) == false ) {
-        std::cout << "Process content faild: " << _projectFilePath.toLocal8Bit().constData() << std::endl;
+        std::cout << "Process content faild: " << _projectFilePath << std::endl;
         return false;
     }
 
@@ -198,7 +192,7 @@ bool xWebProcessor::processStaticFolder(xWebProcessContext& context, xWebML::Sta
 
         if ( fileInfo.isDir() == true ) {
             dir.mkpath(newItemPath);
-            processStaticFolder(context, fileInfo.absoluteFilePath(), newItemPath);
+            processStaticFolder(context, fileInfo.absoluteFilePath().toLocal8Bit().constData(), newItemPath.toLocal8Bit().constData());
         }
         else if ( fileInfo.isFile() == true ) {
             QFile::copy(fileInfo.absoluteFilePath(), newItemPath);
@@ -208,12 +202,12 @@ bool xWebProcessor::processStaticFolder(xWebProcessContext& context, xWebML::Sta
     return true;
 }
 
-bool xWebProcessor::processStaticFolder(xWebProcessContext& context, QString sourceFolder, QString outputFolder) {
-    QString currentFolder = sourceFolder;
+bool xWebProcessor::processStaticFolder(xWebProcessContext& context, std::string sourceFolder, std::string outputFolder) {
+    QString currentFolder = QString::fromStdString(sourceFolder);
 
     QDir dir;
 
-    QDir dir2(sourceFolder);
+    QDir dir2(QString::fromStdString(sourceFolder));
     QFileInfoList entries = dir2.entryInfoList(QDir::AllEntries|QDir::NoDotAndDotDot);
 
     QString absSourceFolder = dir2.absolutePath();
@@ -224,11 +218,11 @@ bool xWebProcessor::processStaticFolder(xWebProcessContext& context, QString sou
         QString itemPath = fileInfo.absoluteFilePath();
         QString relItemPath = itemPath.replace(absSourceFolder, "");
 
-        QString newItemPath = QString("%1/%2").arg(outputFolder).arg(relItemPath);
+        QString newItemPath = QString("%1/%2").arg(QString::fromStdString(outputFolder)).arg(relItemPath);
 
         if ( fileInfo.isDir() == true ) {
             dir.mkpath(newItemPath);
-            processStaticFolder(context, fileInfo.absoluteFilePath(), newItemPath);
+            processStaticFolder(context, fileInfo.absoluteFilePath().toLocal8Bit().constData(), newItemPath.toLocal8Bit().constData());
         }
         else if ( fileInfo.isFile() == true ) {
             QFile::copy(fileInfo.absoluteFilePath(), newItemPath);

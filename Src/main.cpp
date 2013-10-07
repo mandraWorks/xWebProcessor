@@ -37,9 +37,9 @@ int main ( int argc, char **argv )
 
     }
     catch(const std::exception &e){
-        QString errMsg="Application interrupted because of an abnormal exception caught\n";
-        errMsg+="Exception class: std::exception";
-        errMsg+=QString("message: %1 \n").arg(e.what());
+        std::cout << "Application interrupted because of an abnormal exception caught" << std::endl;
+        std::cout << "Exception class: std::exception" << std::endl;
+        std::cout << "message: " << e.what() << std::endl;
 
         return 1;
     }
