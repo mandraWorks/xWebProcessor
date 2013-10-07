@@ -1,17 +1,18 @@
 #ifndef XWEBSTRINGSPARSER_H
 #define XWEBSTRINGSPARSER_H
 
-#include <QtCore>
+#include <string>
+#include <map>
 
 
 class xWebStringsParser
 {
 public:
-  xWebStringsParser(QString filename);
+  xWebStringsParser(std::string filename);
 
   bool parse();
 
-  const QMap<QString,QString>* data() const { return &_data; }
+  const std::map<std::string,std::string>* data() const { return &_data; }
 
 private:
   void processQuotes();
@@ -30,16 +31,16 @@ private:
     Error
   };
 
-  QString    _filename;
+  std::string    _filename;
 
   ParseState _currentState;
-  QString    _previousChar;
-  QString    _currentChar;
+  std::string    _previousChar;
+  char           _currentChar;
 
-  QString    _currentKey;
-  QString    _currentValue;
+  std::string    _currentKey;
+  std::string    _currentValue;
 
-  QMap<QString,QString> _data;
+  std::map<std::string,std::string> _data;
 };
 
 #endif // XWEBSTRINGSPARSER_H

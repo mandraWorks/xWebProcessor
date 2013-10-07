@@ -48,10 +48,12 @@ bool xWebProcessor::run() {
 
     boost::filesystem::create_directory( schemapath);
 
-    //QFile::copy(":/xWebMLStringList.xsd", QString("%1/xWebMLStringList.xsd").arg(schemaDir.absolutePath()));
-    //QFile::copy(":/xWebMLProject.xsd", QString("%1/xWebMLProject.xsd").arg(schemaDir.absolutePath()));
-    //QFile::copy(":/xWebMLTemplate.xsd", QString("%1/xWebMLTemplate.xsd").arg(schemaDir.absolutePath()));
-    //QFile::copy(":/xWebMLLinkList.xsd", QString("%1/xWebMLLinkList.xsd").arg(schemaDir.absolutePath()));
+    boost::filesystem::path sourceSchema = "/Users/mmueller/WorkMandraWorks/Development/xWebProcessor/Schemas";
+
+    boost::filesystem::copy( sourceSchema / "xWebMLStringList.xsd", schemapath / "xWebMLStringList.xsd");
+    boost::filesystem::copy( sourceSchema / "xWebMLProject.xsd",    schemapath / "xWebMLProject.xsd");
+    boost::filesystem::copy( sourceSchema / "xWebMLTemplate.xsd",   schemapath / "xWebMLTemplate.xsd");
+    boost::filesystem::copy( sourceSchema / "xWebMLLinkList.xsd",   schemapath / "xWebMLLinkList.xsd");
 
     try {
         _projectFile = xWebML::xWebProject(_projectFilePath);
@@ -144,9 +146,9 @@ bool xWebProcessor::processContent(xWebProcessContext& context, xWebML::FolderTy
 
 bool xWebProcessor::processFolder(xWebProcessContext& context, xWebML::FolderType& folder) {
 
-    QString folderName = QString(folder.Name().c_str());
+    std::string folderName = folder.Name();
 
-    context.enqueueFolder(folderName);
+    context.enqueueFolder(QString::fromStdString(folderName));
 
     xWebML::Children::Folder_iterator it = folder.Children().Folder().begin();
 

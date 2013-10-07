@@ -44,9 +44,7 @@ void xWebTemplateProcessor::processString(QString xmlData, QTextStream& outStrea
     try {
         std::auto_ptr<xWebML::StringType> xmlString = xWebML::String(stream);
 
-        QString key = QString(xmlString->c_str());
-
-        outStream << _context->getString(key);
+        outStream << QString::fromStdString(_context->getString(xmlString->c_str()));
 
     } catch (const xml_schema::exception& ex) {
         logException(ex);
@@ -68,14 +66,14 @@ void xWebTemplateProcessor::processContentLink(QString xmlData, QTextStream& out
 
         QString folder = QString(xmlContentLink->Folder().c_str());
         QString fileName = QString(xmlContentLink->FileName().c_str());
-        QString contentFileName = QString(_context->workingFolder());
+        QString contentFileName = QString::fromStdString(_context->workingFolder());
 
         contentFileName.append("/");
         contentFileName.append(folder);
-        contentFileName.append(_context->contentPrefix());
+        contentFileName.append(QString::fromStdString(_context->contentPrefix()));
         contentFileName.append(fileName);
 
-        _context->setCurrentContent(contentFileName);
+        _context->setCurrentContent(contentFileName.toLocal8Bit().constData());
 
     } catch (const xml_schema::exception& ex) {
         logException(ex);
@@ -96,8 +94,7 @@ void xWebTemplateProcessor::processContent(QString xmlData, QTextStream& outStre
     try {
         std::auto_ptr<xWebML::ContentType> xmlContent = xWebML::Content(stream);
 
-        QString key = QString(xmlContent->c_str());
-        QString content = _context->getContent(key);
+        QString content = QString::fromStdString(_context->getContent(xmlContent->c_str()));
 
         outStream << content;
 
@@ -132,11 +129,11 @@ void xWebTemplateProcessor::processMenu(QString xmlData, QTextStream& outStream)
             subTemplateFileName = templateFileName;
         }
 
-        QString linkListFile = _context->workingFolder();
+        QString linkListFile = QString::fromStdString(_context->workingFolder());
         linkListFile.append("/");
         linkListFile.append(linkListFileName);
 
-        QString templateFile = _context->workingFolder();
+        QString templateFile = QString::fromStdString(_context->workingFolder());
         templateFile.append("/");
         templateFile.append(templateFileName);
 
@@ -146,14 +143,13 @@ void xWebTemplateProcessor::processMenu(QString xmlData, QTextStream& outStream)
 
         ctemplate::TemplateDictionary dictLink("Link");
         if ( _context->getLocalStrings()->contains("BaseName")==true )
-            dictLink.SetValue("BaseName", _context->getLocalStrings()->stringForKey("BaseName").toLocal8Bit().constData());
+            dictLink.SetValue("BaseName", _context->getLocalStrings()->stringForKey("BaseName"));
         if ( _context->getLocalStrings()->contains("Language")==true )
-            dictLink.SetValue("Language", _context->getLocalStrings()->stringForKey("Language").toLocal8Bit().constData());
+            dictLink.SetValue("Language", _context->getLocalStrings()->stringForKey("Language"));
 
         while ( it != xmlLinkList->LinkEntry().end() ) {
             ctemplate::TemplateDictionary dict("LinkEntry");
 
-            QString stringKey = QString(it->StringKey().c_str());
             QString link = QString(it->Link().c_str());
 
             ctemplate::Template* linkTpl = ctemplate::Template::StringToTemplate(link.toLocal8Bit().constData(), link.length(), ctemplate::DO_NOT_STRIP);
@@ -162,7 +158,7 @@ void xWebTemplateProcessor::processMenu(QString xmlData, QTextStream& outStream)
             linkTpl->Expand(&linkOutput, &dictLink);
 
             dict.SetValue("Link", linkOutput);
-            dict.SetValue("Label", _context->getContent(stringKey).toLocal8Bit().constData());
+            dict.SetValue("Label", _context->getContent(it->StringKey().c_str()));
 
             if ( it->Image().present() == true ) {
                 dict.SetValue("Image", it->Image().get().c_str());

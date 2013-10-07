@@ -1,35 +1,35 @@
 #include <iostream>
+#include <fstream>
 #include "xWebStringsParser.h"
 
-xWebStringsParser::xWebStringsParser(QString filename) :
+xWebStringsParser::xWebStringsParser(std::string filename) :
     _filename(filename),_currentState(Idle)
 {
 }
 
 bool xWebStringsParser::parse() {
-    QFile file(_filename);
+    std::ifstream file;
+    file.open(_filename.c_str(), std::ios::in);
 
-    if ( file.open(QIODevice::ReadOnly) == false ) {
-        std::cout << "Could not open file: " << _filename.toLocal8Bit().constData() << std::endl;
+    if ( !file ) {
+        std::cout << "Could not open file: " << _filename << std::endl;
         return false;
     }
 
-    QTextStream stream(&file);
+    while ( !file.eof() ) {
+        file.get(_currentChar);
 
-    while ( stream.atEnd() == false ) {
-        _currentChar = stream.read(1);
-
-        if ( _currentChar.compare("\"") == 0 )
+        if ( _currentChar == '\"' )
             processQuotes();
-        else if ( _currentChar.compare("=") == 0 )
+        else if ( _currentChar == '=' )
             processAssignment();
-        else if ( _currentChar.compare(";") == 0 )
+        else if ( _currentChar == ';' )
             processSemicolon();
         else
             processChar();
 
         if ( _currentState == Error ) {
-            std::cout << "Parser error: " << _currentKey.toLocal8Bit().constData() << _currentValue.toLocal8Bit().constData() << std::endl;
+            std::cout << "Parser error: " << _currentKey << _currentValue << std::endl;
             return false;
         }
 
@@ -69,7 +69,7 @@ void xWebStringsParser::processAssignment() {
 
 void xWebStringsParser::processSemicolon() {
     if ( _currentState == RowFinished ) {
-        _data.insert(_currentKey, _currentValue);
+        _data.insert(std::pair<std::string,std::string>(_currentKey, _currentValue));
         _currentKey.clear();
         _currentValue.clear();
 

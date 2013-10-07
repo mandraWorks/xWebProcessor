@@ -6,6 +6,8 @@
 //  Copyright 2011 Smartkinematics. All rights reserved.
 //
 #include <xsd/cxx/pre.hxx>
+#include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include "xWebMLStringList.hxx"
 
@@ -14,7 +16,7 @@
 #include "xWebStringsParser.h"
 
 
-xWebStringList::xWebStringList(QString contentFile) {
+xWebStringList::xWebStringList(std::string contentFile) {
   init(contentFile);
 }
 
@@ -25,17 +27,20 @@ xWebStringList::xWebStringList(xWebML::StringListType& list) {
 xWebStringList::~xWebStringList() {
 }
 
-void xWebStringList::init(QString contentFile) {
+void xWebStringList::init(std::string contentFile) {
     _data.clear();
 
-    QFileInfo contentFileInfo(contentFile);
+    boost::filesystem::path contentFilePath = contentFile;
 
-    if ( contentFileInfo.completeSuffix().compare("xwebstringlist.xml", Qt::CaseInsensitive) == 0 ) {
-      std::auto_ptr<xWebML::StringListType> content = xWebML::StringList(contentFile.toLocal8Bit().constData());
+    std::string ext1 = boost::algorithm::to_lower_copy( contentFilePath.extension().string());
+    std::string ext2 = boost::algorithm::to_lower_copy( contentFilePath.stem().extension().string());
 
-      init(*content);
+    if ( (ext1.compare(".xml") == 0) && (ext2.compare(".xwebstringlist") == 0)) {
+        std::auto_ptr<xWebML::StringListType> content = xWebML::StringList(contentFile);
+
+        init(*content);
     }
-    else if ( contentFileInfo.completeSuffix().compare("strings", Qt::CaseInsensitive) == 0 ) {
+    else if ( ext1.compare(".strings") == 0 ) {
       xWebStringsParser parser(contentFile);
 
       _data.clear();
@@ -50,26 +55,44 @@ void xWebStringList::init(xWebML::StringListType& list) {
     xWebML::StringListType::Entry_iterator it = list.Entry().begin();
     
     while ( it != list.Entry().end() ) {
-        QString key(it->Key().c_str());
-        QString value = QString::fromUtf8(it->Value().c_str());
+        std::string key = it->Key();
+        std::string value = it->Value();
         
-        _data.insert(key, value);
+        _data.insert(std::pair<std::string, std::string>(key, value));
         
         it++;
     }
 }
 
-bool xWebStringList::contains(QString key) const {
-  return _data.contains(key);
+bool xWebStringList::contains(std::string key) const {
+    return _data.find(key) == _data.end() ? false : true ;
 }
 
-QString xWebStringList::stringForKey(QString key) const {
+std::string xWebStringList::stringForKey(std::string key) const {
     if ( contains(key) == false )
-      return QString();
+        return "";
+
+    std::string value = _data.at(key);
     
-    return _data[key];
+    return value;
 }
 
-QList<QString> xWebStringList::keys() const {
-    return _data.keys();
+void xWebStringList::init() {
+    _iterator = _data.begin();
+}
+
+bool xWebStringList::more() const {
+    return  _iterator == _data.end() ? false : true ;
+}
+
+void xWebStringList::next() {
+    ++_iterator;
+}
+
+std::string xWebStringList::key() {
+    return _iterator->first;
+}
+
+std::string xWebStringList::value() {
+    return _iterator->second;
 }
