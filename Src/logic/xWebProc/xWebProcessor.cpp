@@ -7,7 +7,6 @@
 //
 #include <stream.h>
 #include <xsd/cxx/pre.hxx>
-#include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
 
 #include "xWebMLProject.hxx"
@@ -180,8 +179,7 @@ bool xWebProcessor::processStaticFolder(xWebProcessContext& context, xWebML::Sta
 
     try
     {
-        currentFolder= boost::filesystem::canonical(
-                    boost::filesystem::path(context.currentFolder()) / folderName );
+        currentFolder= boost::filesystem::path(context.currentFolder()) / folderName ;
     }
     catch (boost::filesystem::filesystem_error const &ex)
     {
@@ -197,15 +195,8 @@ bool xWebProcessor::processStaticFolder(xWebProcessContext& context, xWebML::Sta
     boost::filesystem::path sourceFolder = boost::filesystem::canonical(
                 boost::filesystem::path(context.workingFolder()) / staticFolder.SourceFolder() );
 
-    try
-    {
-        boost::filesystem::copy_directory(sourceFolder, currentFolder);
-    }
-    catch ( boost::filesystem::filesystem_error const &ex)
-    {
-        std::cout << "ERROR: " << ex.what() << std::endl;
+    if ( !copyFolder(sourceFolder, currentFolder) )
         return false;
-    }
 
     return true;
 }
@@ -214,6 +205,52 @@ bool xWebProcessor::processFileItem(xWebProcessContext& context, xWebML::FileIte
 
     xWebFileItemProcessor fileItemProcessor(fileItem);
     fileItemProcessor.run(context);
+
+    return true;
+}
+
+bool xWebProcessor::copyFolder(boost::filesystem::path sourcefolder, boost::filesystem::path destFolder) {
+    try
+    {
+        if ( !boost::filesystem::exists(sourcefolder) || !boost::filesystem::is_directory(sourcefolder)) {
+            std::cout << "Source folder " << sourcefolder.string() << " do not exists or is not a directory." << std::endl;
+            return false;
+        }
+
+        if ( boost::filesystem::exists(destFolder) ) {
+            std::cout << "Destination folder " << destFolder.string() << " already exists." << std::endl;
+            return false;
+        }
+
+        if ( !boost::filesystem::create_directory(destFolder)) {
+            std::cout << "Unable to create destination directory " << destFolder.string() << std::endl;
+            return false;
+        }
+    }
+    catch (boost::filesystem::filesystem_error const &ex ) {
+        std::cout << "ERROR: " << ex.what() << std::endl;
+        return false;
+    }
+
+    // Iterate through the source directory
+    for( boost::filesystem::directory_iterator file(sourcefolder); file != boost::filesystem::directory_iterator(); ++file ) {
+
+        try {
+            boost::filesystem::path current = file->path();
+
+            if ( boost::filesystem::is_directory(current) == true ) {
+                if ( !copyFolder(current, destFolder / current.filename()) )
+                    return false;
+            }
+            else {
+                boost::filesystem::copy(current, destFolder / current.filename());
+            }
+        }
+        catch (boost::filesystem::filesystem_error const &ex ) {
+            std::cout << "ERROR: " << ex.what() << std::endl;
+            return false;
+        }
+    }
 
     return true;
 }

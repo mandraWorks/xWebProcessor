@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include <boost/filesystem.hpp>
 
 
 namespace xWebML {
@@ -35,6 +36,8 @@ private:
     bool processFolder(xWebProcessContext& context, xWebML::FolderType& folder);
     bool processStaticFolder(xWebProcessContext& context, xWebML::StaticFolderType& staticFolder);
     bool processFileItem(xWebProcessContext& context, xWebML::FileItemType& fileItem);
+
+    bool copyFolder(boost::filesystem::path sourcefolder, boost::filesystem::path destFolder);
     
 private:
     std::string _projectFilePath;
