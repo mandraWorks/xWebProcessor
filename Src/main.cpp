@@ -10,6 +10,7 @@
 
 int main ( int argc, char **argv )
 {
+    std::cout << "xWebProcessor v0.1.0" << std::endl;
 
     try{
         // Declare the supported options.

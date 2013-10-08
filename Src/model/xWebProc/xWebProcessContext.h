@@ -18,7 +18,7 @@ class xWebStringList;
 
 class xWebProcessContext {
 public:
-  xWebProcessContext(xWebML::Settings& settings);
+  xWebProcessContext(xWebML::Settings& settings, std::string workingFolder);
   ~xWebProcessContext();
 
   void setLocalStrings(xWebStringList* list) { _localStrings = list; }
@@ -49,6 +49,7 @@ public:
   std::string expandTemplate(std::string templ);
 
 private:
+  std::string _workingFolder;
   std::string _outputFolder;
   std::queue<std::string>  _currentFolder;
 

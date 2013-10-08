@@ -34,7 +34,6 @@ private:
     
     bool processFolder(xWebProcessContext& context, xWebML::FolderType& folder);
     bool processStaticFolder(xWebProcessContext& context, xWebML::StaticFolderType& staticFolder);
-    bool processStaticFolder(xWebProcessContext& context, std::string sourceFolder, std::string outputFolder);
     bool processFileItem(xWebProcessContext& context, xWebML::FileItemType& fileItem);
     
 private:

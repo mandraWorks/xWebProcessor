@@ -6,7 +6,8 @@
 //  Copyright 2011 Smartkinematics. All rights reserved.
 //
 
-#include <QtCore>
+#include <string>
+#include <list>
 
 namespace xWebML {
     class FileItemType;
@@ -30,12 +31,12 @@ private:
     void releaseRun(xWebProcessContext& context);
     
 private:
-    QString _processingMethod;
-    QString _sourceFilePath;
-    QString _outputFolder;
-    QString _targetFileName;
-    QString _contentPrefix;
-    QStringList  _activeMenuIDs;
+    std::string _processingMethod;
+    std::string _sourceFilePath;
+    std::string _outputFolder;
+    std::string _targetFileName;
+    std::string _contentPrefix;
+    std::list<std::string>  _activeMenuIDs;
     
     xWebStringList* _strings;
 };

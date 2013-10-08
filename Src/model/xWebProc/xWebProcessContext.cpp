@@ -18,8 +18,8 @@
 #include "model/xWebProc/xWebStringList.h"
 
 
-xWebProcessContext::xWebProcessContext(xWebML::Settings& settings) :
-  _localStrings(0), _activeMenuIDs(0)
+xWebProcessContext::xWebProcessContext(xWebML::Settings& settings, std::string workingFolder) :
+  _workingFolder(workingFolder), _localStrings(0), _activeMenuIDs(0)
 {
 
   _outputFolder = settings.OutputFolder();
@@ -81,7 +81,7 @@ std::string xWebProcessContext::getContent(std::string key) const {
 }
 
 std::string xWebProcessContext::workingFolder() const {
-    return boost::filesystem::current_path().string();
+    return _workingFolder;
 }
 
 void xWebProcessContext::initCurrentFolder() {

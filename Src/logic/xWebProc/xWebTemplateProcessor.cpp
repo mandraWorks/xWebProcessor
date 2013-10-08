@@ -8,6 +8,9 @@
 #include <xsd/cxx/pre.hxx>
 #include <ctemplate/template.h>
 
+#include <fstream>
+#include <boost/filesystem.hpp>
+
 #include "xWebMLTemplate.hxx"
 #include "xWebMLLinkList.hxx"
 #include "xWebMLStringList.hxx"
@@ -173,9 +176,10 @@ void xWebTemplateProcessor::processMenu(QString xmlData, QTextStream& outStream)
                 dict.ShowSection("Sub_Sec");
             }
 
-            QString id = QString(it->ID().c_str());
+            std::string id = it->ID();
 
-            if ( (_context->activeMenuIDs().length() != 0) && (_context->activeMenuIDs().contains(id) == true ) )
+            std::list<std::string> activeMenuIDs = _context->activeMenuIDs();
+            if ( (activeMenuIDs.size() != 0) && (std::find( activeMenuIDs.begin(), activeMenuIDs.end(), id) != activeMenuIDs.end() ) )
                 dict.ShowSection("Act_Sec");
 
             it++;
@@ -209,38 +213,40 @@ void xWebTemplateProcessor::processIncludeFile(QString xmlData, QTextStream& out
     try {
         std::auto_ptr<xWebML::IncludeFileType> xmlIncludeFile = xWebML::IncludeFile(stream);
 
-        QString includeFileName = QString(xmlIncludeFile->File().c_str());
+        std::string includeFileName = xmlIncludeFile->File();
         includeFileName = _context->expandTemplate(includeFileName);
 
-        QString includeFilePath = _context->workingFolder();
+        std::string includeFilePath = _context->workingFolder();
         includeFilePath.append("/");
         includeFilePath.append(includeFileName);
 
-        QFile includeFile(includeFilePath);
+        boost::filesystem::path includeFile = includeFilePath;
 
-        if ( includeFile.exists() == false ) {
-            std::cout << " Include file do not exists: " << includeFilePath.toLocal8Bit().constData() << std::endl;
+        if ( boost::filesystem::exists(includeFile) == false ) {
+            std::cout << " Include file do not exists: " << includeFilePath << std::endl;
             return;
         }
 
-        if ( includeFile.open(QIODevice::ReadOnly|QIODevice::Text) == false ) {
-            std::cout << " Could not open include file: " << includeFilePath.toLocal8Bit().constData() << std::endl;
+        std::ifstream file;
+        file.open (includeFile.string().c_str(), std::ifstream::in);
+
+        if ( !file ) {
+            std::cout << " Could not open include file: " << includeFilePath << std::endl;
             return;
         }
 
-        QString line;
-        QTextStream includeStream(&includeFile);
+        std::string line;
 
         xWebTemplateParser parser;
         parser.setDelegate(this);
         parser.init();
 
-        do {
-            line = includeStream.readLine();
-            parser.parseLine(line, outStream);
-        } while (!line.isNull());
+        while (!file.eof()) {
+            std::getline(file, line);
+            parser.parseLine(QString::fromStdString(line), outStream);
+        };
 
-        includeFile.close();
+        file.close();
 
     } catch (const xml_schema::exception& ex) {
         logException(ex);
@@ -252,22 +258,21 @@ void xWebTemplateProcessor::processSubMenu(xWebML::LinkListType& xmlSubLinks, QS
     QTextStream stream(&output);
     try {
 
-        QString templateFile = _context->workingFolder();
+        std::string templateFile = _context->workingFolder();
         templateFile.append("/");
-        templateFile.append(templateFileName);
+        templateFile.append(templateFileName.toLocal8Bit().constData());
 
         xWebML::LinkListType::LinkEntry_iterator it = xmlSubLinks.LinkEntry().begin();
 
         ctemplate::TemplateDictionary dictLink("Link");
         if ( _context->getLocalStrings()->contains("BaseName")==true )
-            dictLink.SetValue("BaseName", _context->getLocalStrings()->stringForKey("BaseName").toLocal8Bit().constData());
+            dictLink.SetValue("BaseName", _context->getLocalStrings()->stringForKey("BaseName"));
         if ( _context->getLocalStrings()->contains("Language")==true )
-            dictLink.SetValue("Language", _context->getLocalStrings()->stringForKey("Language").toLocal8Bit().constData());
+            dictLink.SetValue("Language", _context->getLocalStrings()->stringForKey("Language"));
 
         while ( it != xmlSubLinks.LinkEntry().end() ) {
             ctemplate::TemplateDictionary dict("LinkEntry");
 
-            QString stringKey = QString(it->StringKey().c_str());
             QString link = QString(it->Link().c_str());
 
             ctemplate::Template* linkTpl = ctemplate::Template::StringToTemplate(link.toLocal8Bit().constData(), link.length(), ctemplate::DO_NOT_STRIP);
@@ -276,7 +281,7 @@ void xWebTemplateProcessor::processSubMenu(xWebML::LinkListType& xmlSubLinks, QS
             linkTpl->Expand(&linkOutput, &dictLink);
 
             dict.SetValue("Link", linkOutput);
-            dict.SetValue("Label", _context->getContent(stringKey).toLocal8Bit().constData());
+            dict.SetValue("Label", _context->getContent(it->StringKey()));
 
             if ( it->Image().present() == true ) {
                 dict.SetValue("Image", it->Image().get().c_str());
@@ -291,9 +296,10 @@ void xWebTemplateProcessor::processSubMenu(xWebML::LinkListType& xmlSubLinks, QS
                 dict.ShowSection("Sub_Sec");
             }
 
-            QString id = QString(it->ID().c_str());
+            std::string id = it->ID();
 
-            if ( (_context->activeMenuIDs().length() != 0) && (_context->activeMenuIDs().contains(id) == true ) )
+            std::list<std::string> activeMenuIDs = _context->activeMenuIDs();
+            if ( (activeMenuIDs.size() != 0) && (std::find( activeMenuIDs.begin(), activeMenuIDs.end(), id) != activeMenuIDs.end() ) )
                 dict.ShowSection("Act_Sec");
 
             it++;
@@ -301,7 +307,7 @@ void xWebTemplateProcessor::processSubMenu(xWebML::LinkListType& xmlSubLinks, QS
             if ( it != xmlSubLinks.LinkEntry().end() )
                 dict.ShowSection("Sep_Sec");
 
-            ctemplate::Template* tpl = ctemplate::Template::GetTemplate(templateFile.toLocal8Bit().constData(), ctemplate::DO_NOT_STRIP);
+            ctemplate::Template* tpl = ctemplate::Template::GetTemplate(templateFile, ctemplate::DO_NOT_STRIP);
 
             std::string output;
             tpl->Expand(&output, &dict);

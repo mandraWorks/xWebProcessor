@@ -8,6 +8,7 @@
 #include <stream.h>
 #include <xsd/cxx/pre.hxx>
 #include <boost/filesystem.hpp>
+#include <boost/foreach.hpp>
 
 #include "xWebMLProject.hxx"
 
@@ -36,6 +37,15 @@ bool xWebProcessor::run() {
         return false;
     }
 
+    boost::filesystem::path projectfile = _projectFilePath;
+    boost::filesystem::path basefolder = boost::filesystem::canonical(projectfile.parent_path());
+
+    std::cout << "Project root folder: " << basefolder << std::endl;
+
+    boost::filesystem::path prevWorking = boost::filesystem::current_path();
+
+    boost::filesystem::current_path(basefolder);
+
     // deploy schemas
     boost::filesystem::path fileInfo(_projectFilePath);
     boost::filesystem::path schemapath = fileInfo.parent_path();
@@ -48,7 +58,7 @@ bool xWebProcessor::run() {
 
     boost::filesystem::create_directory( schemapath);
 
-    boost::filesystem::path sourceSchema = "/Users/mmueller/WorkMandraWorks/Development/xWebProcessor/Schemas";
+    boost::filesystem::path sourceSchema = "/Volumes/untitled/WorkMandraworks/Development/xWebProcessor/Schemas";
 
     boost::filesystem::copy( sourceSchema / "xWebMLStringList.xsd", schemapath / "xWebMLStringList.xsd");
     boost::filesystem::copy( sourceSchema / "xWebMLProject.xsd",    schemapath / "xWebMLProject.xsd");
@@ -64,7 +74,7 @@ bool xWebProcessor::run() {
     }
 
 
-    xWebProcessContext context(_projectFile->Settings());
+    xWebProcessContext context(_projectFile->Settings(), basefolder.string());
 
     if ( prepareOutputFolder(context) == false ) {
         std::cout << "Prepare output folder faild: " << _projectFilePath<< std::endl;
@@ -78,6 +88,8 @@ bool xWebProcessor::run() {
 
     std::cout << "xWebProcessor succedded" << std::endl;
 
+    boost::filesystem::current_path(prevWorking);
+
     return true;
 }
 
@@ -86,16 +98,12 @@ bool xWebProcessor::prepareOutputFolder(xWebProcessContext& context) {
 
     context.initCurrentFolder();
 
-    std::cout << "Outputfolder: " << context.currentFolder().toLocal8Bit().constData() << std::endl;
+    std::cout << "Outputfolder: " << context.currentFolder() << std::endl;
 
-    QString outputFolderPath = context.currentFolder();
+    std::string outputFolderPath = context.currentFolder();
 
-    //mandraworks::core::system::SystemLib::rmFolder(outputFolderPath);
-
-    QDir dir(outputFolderPath);
-
-    if ( dir.exists() == false )
-        dir.mkpath(outputFolderPath);
+    if ( boost::filesystem::exists(outputFolderPath) == false )
+        boost::filesystem::create_directory(outputFolderPath);
 
     return true;
 }
@@ -148,7 +156,7 @@ bool xWebProcessor::processFolder(xWebProcessContext& context, xWebML::FolderTyp
 
     std::string folderName = folder.Name();
 
-    context.enqueueFolder(QString::fromStdString(folderName));
+    context.enqueueFolder(folderName);
 
     xWebML::Children::Folder_iterator it = folder.Children().Folder().begin();
 
@@ -167,68 +175,36 @@ bool xWebProcessor::processFolder(xWebProcessContext& context, xWebML::FolderTyp
 
 bool xWebProcessor::processStaticFolder(xWebProcessContext& context, xWebML::StaticFolderType& staticFolder) {
 
-    QString folderName = QString(staticFolder.Name().c_str());
-    QString currentFolder = QString("%1/%2").arg(context.currentFolder()).arg(folderName);
+    std::string folderName = staticFolder.Name();
+    boost::filesystem::path currentFolder;
 
-    QDir dir(currentFolder);
-
-    if ( dir.exists())
-        boost::filesystem::remove_all(currentFolder.toLocal8Bit().constData());
-
-    dir.mkpath(currentFolder);
-
-    QString sourceFolder = QString(staticFolder.SourceFolder().c_str());
-
-    QDir dir2(sourceFolder);
-    QFileInfoList entries = dir2.entryInfoList(QDir::AllEntries|QDir::NoDotAndDotDot);
-
-    QString absSourceFolder = dir2.absolutePath();
-
-    for ( int i=0; i<entries.count(); i++) {
-        QFileInfo fileInfo = entries.at(i);
-
-        QString itemPath = fileInfo.absoluteFilePath();
-        QString relItemPath = itemPath.replace(absSourceFolder, "");
-
-        QString newItemPath = QString("%1/%2").arg(currentFolder).arg(relItemPath);
-
-        if ( fileInfo.isDir() == true ) {
-            dir.mkpath(newItemPath);
-            processStaticFolder(context, fileInfo.absoluteFilePath().toLocal8Bit().constData(), newItemPath.toLocal8Bit().constData());
-        }
-        else if ( fileInfo.isFile() == true ) {
-            QFile::copy(fileInfo.absoluteFilePath(), newItemPath);
-        }
+    try
+    {
+        currentFolder= boost::filesystem::canonical(
+                    boost::filesystem::path(context.currentFolder()) / folderName );
+    }
+    catch (boost::filesystem::filesystem_error const &ex)
+    {
+        std::cout << "ERROR: " << ex.what() << std::endl;
+        return false;
     }
 
-    return true;
-}
+    if ( boost::filesystem::exists(currentFolder) == true)
+        boost::filesystem::remove_all(currentFolder);
 
-bool xWebProcessor::processStaticFolder(xWebProcessContext& context, std::string sourceFolder, std::string outputFolder) {
-    QString currentFolder = QString::fromStdString(sourceFolder);
+    //boost::filesystem::create_directory(currentFolder);
 
-    QDir dir;
+    boost::filesystem::path sourceFolder = boost::filesystem::canonical(
+                boost::filesystem::path(context.workingFolder()) / staticFolder.SourceFolder() );
 
-    QDir dir2(QString::fromStdString(sourceFolder));
-    QFileInfoList entries = dir2.entryInfoList(QDir::AllEntries|QDir::NoDotAndDotDot);
-
-    QString absSourceFolder = dir2.absolutePath();
-
-    for ( int i=0; i<entries.count(); i++) {
-        QFileInfo fileInfo = entries.at(i);
-
-        QString itemPath = fileInfo.absoluteFilePath();
-        QString relItemPath = itemPath.replace(absSourceFolder, "");
-
-        QString newItemPath = QString("%1/%2").arg(QString::fromStdString(outputFolder)).arg(relItemPath);
-
-        if ( fileInfo.isDir() == true ) {
-            dir.mkpath(newItemPath);
-            processStaticFolder(context, fileInfo.absoluteFilePath().toLocal8Bit().constData(), newItemPath.toLocal8Bit().constData());
-        }
-        else if ( fileInfo.isFile() == true ) {
-            QFile::copy(fileInfo.absoluteFilePath(), newItemPath);
-        }
+    try
+    {
+        boost::filesystem::copy_directory(sourceFolder, currentFolder);
+    }
+    catch ( boost::filesystem::filesystem_error const &ex)
+    {
+        std::cout << "ERROR: " << ex.what() << std::endl;
+        return false;
     }
 
     return true;
