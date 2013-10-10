@@ -8,21 +8,21 @@
 
 #include <xsd/cxx/pre.hxx>
 #include <ctemplate/template.h>
+#include <boost/filesystem.hpp>
 
 #include "xWebMLProject.hxx"
 
 #include <iostream>
 
 #include "xWebProcessContext.h"
-#include "mandraworks/core/log/Log.h"
 #include "model/xWebProc/xWebStringList.h"
 
 
-xWebProcessContext::xWebProcessContext(xWebML::Settings& settings) :
-  _localStrings(0), _activeMenuIDs(0)
+xWebProcessContext::xWebProcessContext(xWebML::Settings& settings, std::string workingFolder) :
+  _workingFolder(workingFolder), _localStrings(0), _activeMenuIDs(0)
 {
 
-  _outputFolder = QString(settings.OutputFolder().c_str());
+  _outputFolder = settings.OutputFolder();
 
   _globalStrings  = new xWebStringList(settings.StringList());
   _content        = 0;
@@ -36,7 +36,7 @@ xWebProcessContext::~xWebProcessContext() {
     delete _content;
 }
 
-void xWebProcessContext::setCurrentContent(QString contentFile) {
+void xWebProcessContext::setCurrentContent(std::string contentFile) {
   if ( _content == 0 )
     _content = new xWebStringList(contentFile);
   else
@@ -50,15 +50,15 @@ void xWebProcessContext::setCurrentContent(xWebML::StringListType& list) {
     _content->init(list);
 }
 
-void xWebProcessContext::setContentPrefix(QString str) {
+void xWebProcessContext::setContentPrefix(std::string str) {
   _contentPrefix = str;
 }
 
-void xWebProcessContext::setActiveMenuIDs(QStringList array) {
+void xWebProcessContext::setActiveMenuIDs(std::list<std::string> array) {
   _activeMenuIDs = array;
 }
 
-QString xWebProcessContext::getString(QString key) const {
+std::string xWebProcessContext::getString(std::string key) const {
   if ( _localStrings != 0 ) {
     if ( _localStrings->contains(key) == true )
       return _localStrings->stringForKey(key);
@@ -67,66 +67,63 @@ QString xWebProcessContext::getString(QString key) const {
   if ( _globalStrings->contains(key) == true )
     return _globalStrings->stringForKey(key);
 
-  return QString();
+  return "";
 }
 
-QString xWebProcessContext::getContent(QString key) const {
+std::string xWebProcessContext::getContent(std::string key) const {
   if ( _content != 0 ) {
     if ( _content->contains(key) == true ) {
       return _content->stringForKey(key);
     }
   }
 
-  return QString();
+  return "";
 }
 
-QString xWebProcessContext::workingFolder() const {
-
-  return QDir::currentPath();
+std::string xWebProcessContext::workingFolder() const {
+    return _workingFolder;
 }
 
 void xWebProcessContext::initCurrentFolder() {
-  QString currentFolder = QString("%1/%2").arg(workingFolder()).arg(_outputFolder);
+  boost::filesystem::path currentFolder = boost::filesystem::path(workingFolder()) / _outputFolder;
 
-  QDir dir;
-  dir.mkpath(currentFolder);
+  boost::filesystem::create_directory(currentFolder);
 
-  _currentFolder.append(currentFolder);
+  _currentFolder.push(currentFolder.string());
 }
 
-void xWebProcessContext::enqueueFolder(QString folder) {
+void xWebProcessContext::enqueueFolder(std::string folder) {
 
-  QString newFolderPath = QString("%1/%2").arg(currentFolder()).arg(folder);
+  boost::filesystem::path newFolderPath = boost::filesystem::path(currentFolder()) / folder;
 
-  QDir dir;
-  dir.mkpath(newFolderPath);
+  boost::filesystem::create_directory(newFolderPath);
 
-  mandraworks::core::log::Log::info(QString("New folder: %1").arg(newFolderPath));
+  std::cout << "New folder: " << newFolderPath << std::endl;
 
-  _currentFolder.append(newFolderPath);
+  _currentFolder.push(newFolderPath.string());
 }
 
 void xWebProcessContext::dequeueFolder() {
-  _currentFolder.removeLast();
+  _currentFolder.pop();
 }
 
-QString xWebProcessContext::currentFolder() {    
-  return _currentFolder.last();
+std::string xWebProcessContext::currentFolder() {
+  return _currentFolder.back();
 }
 
-QString xWebProcessContext::expandTemplate(QString templ) {
+std::string xWebProcessContext::expandTemplate(std::string templ) {
   ctemplate::TemplateDictionary dict("File");
 
-  for ( int i=0; i<getGlobalStrings()->keys().count(); i++) {
-      QString key = getGlobalStrings()->keys().at(i);
-      QString value = getGlobalStrings()->stringForKey(key);
-      dict.SetValue( key.toLocal8Bit().constData(), value.toLocal8Bit().constData());
+  for ( getGlobalStrings()->init(); getGlobalStrings()->more(); getGlobalStrings()->next()) {
+      std::string key = getGlobalStrings()->key();
+      std::string value = getGlobalStrings()->value();
+      dict.SetValue( key, value);
   }
 
   if ( getLocalStrings()->contains("BaseName")==true )
-      dict.SetValue("BaseName", getLocalStrings()->stringForKey("BaseName").toLocal8Bit().constData());
+      dict.SetValue("BaseName", getLocalStrings()->stringForKey("BaseName"));
   if ( getLocalStrings()->contains("Language")==true )
-      dict.SetValue("Language", getLocalStrings()->stringForKey("Language").toLocal8Bit().constData());
+      dict.SetValue("Language", getLocalStrings()->stringForKey("Language"));
 
   time_t rawtime;
   struct tm * timeinfo;
@@ -139,10 +136,10 @@ QString xWebProcessContext::expandTemplate(QString templ) {
 
   dict.SetValue("CurrentTime", buffer);
 
-  ctemplate::Template* tpl = ctemplate::Template::StringToTemplate(templ.toLocal8Bit().constData(), ctemplate::DO_NOT_STRIP);
+  ctemplate::Template* tpl = ctemplate::Template::StringToTemplate(templ, ctemplate::DO_NOT_STRIP);
 
   std::string output;
   tpl->Expand(&output, &dict);
 
-  return QString::fromStdString(output);
+  return output;
 }

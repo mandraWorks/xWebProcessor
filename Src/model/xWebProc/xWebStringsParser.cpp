@@ -1,87 +1,87 @@
+#include <iostream>
+#include <fstream>
 #include "xWebStringsParser.h"
-#include "mandraworks/core/log/Log.h"
 
-xWebStringsParser::xWebStringsParser(QString filename) :
-  _filename(filename),_currentState(Idle)
+xWebStringsParser::xWebStringsParser(std::string filename) :
+    _filename(filename),_currentState(Idle)
 {
 }
 
 bool xWebStringsParser::parse() {
-  QFile file(_filename);
+    std::ifstream file;
+    file.open(_filename.c_str(), std::ios::in);
 
-  if ( file.open(QIODevice::ReadOnly) == false ) {
-    mandraworks::core::log::Log::error(QString("Could not open file: %1").arg(_filename));
-    return false;
-  }
-
-  QTextStream stream(&file);
-
-  while ( stream.atEnd() == false ) {
-    _currentChar = stream.read(1);
-
-    if ( _currentChar.compare("\"") == 0 )
-      processQuotes();
-    else if ( _currentChar.compare("=") == 0 )
-      processAssignment();
-    else if ( _currentChar.compare(";") == 0 )
-      processSemicolon();
-    else
-      processChar();
-
-    if ( _currentState == Error ) {
-      mandraworks::core::log::Log::error(QString("Parser error: %1 %2").arg(_currentKey).arg(_currentValue));
-      return false;
+    if ( !file ) {
+        std::cout << "Could not open file: " << _filename << std::endl;
+        return false;
     }
 
-    _previousChar = _currentChar;
-  }
+    while ( !file.eof() ) {
+        file.get(_currentChar);
 
-  return true;
+        if ( _currentChar == '\"' )
+            processQuotes();
+        else if ( _currentChar == '=' )
+            processAssignment();
+        else if ( _currentChar == ';' )
+            processSemicolon();
+        else
+            processChar();
+
+        if ( _currentState == Error ) {
+            std::cout << "Parser error: " << _currentKey << _currentValue << std::endl;
+            return false;
+        }
+
+        _previousChar = _currentChar;
+    }
+
+    return true;
 }
 
 void xWebStringsParser::processQuotes() {
-  if ( _currentState == Idle ) {
-    _currentState = InKey;
-  }
-  else if ( _currentState == InKey ) {
-    _currentState = BeforeAssignemet;
-  }
-  else if ( _currentState == AfterAssignemet ) {
-    _currentState = InValue;
-  }
-  else if ( _currentState == InValue ) {
-    if ( _previousChar.compare("\\") != 0 ) //ignore \"
-      _currentState = RowFinished;
-    else
-      _currentValue += _currentChar;
-  }
+    if ( _currentState == Idle ) {
+        _currentState = InKey;
+    }
+    else if ( _currentState == InKey ) {
+        _currentState = BeforeAssignemet;
+    }
+    else if ( _currentState == AfterAssignemet ) {
+        _currentState = InValue;
+    }
+    else if ( _currentState == InValue ) {
+        if ( _previousChar.compare("\\") != 0 ) //ignore \"
+            _currentState = RowFinished;
+        else
+            _currentValue += _currentChar;
+    }
 }
 
 void xWebStringsParser::processAssignment() {
-  if ( _currentState == BeforeAssignemet ) {
-    _currentState = AfterAssignemet;
-  }
-  else if(_currentState == InValue)
-  {
-    _currentValue += _currentChar;
-  }
+    if ( _currentState == BeforeAssignemet ) {
+        _currentState = AfterAssignemet;
+    }
+    else if(_currentState == InValue)
+    {
+        _currentValue += _currentChar;
+    }
 }
 
 void xWebStringsParser::processSemicolon() {
-  if ( _currentState == RowFinished ) {
-    _data.insert(_currentKey, _currentValue);
-    _currentKey.clear();
-    _currentValue.clear();
+    if ( _currentState == RowFinished ) {
+        _data.insert(std::pair<std::string,std::string>(_currentKey, _currentValue));
+        _currentKey.clear();
+        _currentValue.clear();
 
-    _currentState = Idle;
-  }
-  else
-    _currentValue += _currentChar;
+        _currentState = Idle;
+    }
+    else
+        _currentValue += _currentChar;
 }
 
 void xWebStringsParser::processChar() {
-  if ( _currentState == InKey )
-    _currentKey += _currentChar;
-  else if ( _currentState == InValue )
-    _currentValue += _currentChar;
+    if ( _currentState == InKey )
+        _currentKey += _currentChar;
+    else if ( _currentState == InValue )
+        _currentValue += _currentChar;
 }

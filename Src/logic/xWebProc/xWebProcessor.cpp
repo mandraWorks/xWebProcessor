@@ -7,12 +7,11 @@
 //
 #include <stream.h>
 #include <xsd/cxx/pre.hxx>
+#include <boost/foreach.hpp>
+
 #include "xWebMLProject.hxx"
 
 #include "xWebProcessor.h"
-
-#include "mandraworks/core/log/Log.h"
-#include "mandraworks/core/system/SystemLib.h"
 
 #include "model/xWebProc/xWebProcessContext.h"
 #include "logic/xWebProc/xWebFileItemProcessor.h"
@@ -27,79 +26,83 @@ xWebProcessor::xWebProcessor()
 xWebProcessor::~xWebProcessor() {
 }
 
-void xWebProcessor::setProjectFilePath(QString path) {
+void xWebProcessor::setProjectFilePath(std::string path) {
     _projectFilePath = path;
 }
 
-void xWebProcessor::setProjectFilePath(std::string path) {
-    _projectFilePath = QString::fromStdString(path);
-}
-
 bool xWebProcessor::run() {
-    if ( QFile::exists(_projectFilePath) == false ) {
-        mandraworks::core::log::Log::error(QString("Project file do not exists: %1").arg(_projectFilePath));
+    if ( boost::filesystem::exists(_projectFilePath) == false ) {
+        std::cout << "Project file do not exists: " << _projectFilePath << std::endl;
         return false;
     }
+
+    boost::filesystem::path projectfile = _projectFilePath;
+    boost::filesystem::path basefolder = boost::filesystem::canonical(projectfile.parent_path());
+
+    std::cout << "Project root folder: " << basefolder << std::endl;
+
+    boost::filesystem::path prevWorking = boost::filesystem::current_path();
+
+    boost::filesystem::current_path(basefolder);
 
     // deploy schemas
-    QFileInfo fileInfo(_projectFilePath);
-    QDir schemaDir(fileInfo.absolutePath());
-    if ( schemaDir.exists("Schemas") == true ) {
-        mandraworks::core::system::SystemLib::rmFolder(QString("%1/Schemas").arg(fileInfo.absolutePath()));
+    boost::filesystem::path fileInfo(_projectFilePath);
+    boost::filesystem::path schemapath = fileInfo.parent_path();
+    schemapath /= "Schemas";
+    if ( boost::filesystem::exists(schemapath) == true ) {
+        std::cout << "Empty schema folder: " << schemapath << std::endl;
+        boost::filesystem::remove_all(schemapath);
     }
 
-    schemaDir.mkdir("Schemas");
-    schemaDir.cd("Schemas");
 
-    QFile::copy(":/xWebMLStringList.xsd", QString("%1/xWebMLStringList.xsd").arg(schemaDir.absolutePath()));
-    QFile::copy(":/xWebMLProject.xsd", QString("%1/xWebMLProject.xsd").arg(schemaDir.absolutePath()));
-    QFile::copy(":/xWebMLTemplate.xsd", QString("%1/xWebMLTemplate.xsd").arg(schemaDir.absolutePath()));
-    QFile::copy(":/xWebMLLinkList.xsd", QString("%1/xWebMLLinkList.xsd").arg(schemaDir.absolutePath()));
+    boost::filesystem::create_directory( schemapath);
+
+    boost::filesystem::path sourceSchema = "/Volumes/untitled/WorkMandraworks/Development/xWebProcessor/Schemas";
+
+    boost::filesystem::copy( sourceSchema / "xWebMLStringList.xsd", schemapath / "xWebMLStringList.xsd");
+    boost::filesystem::copy( sourceSchema / "xWebMLProject.xsd",    schemapath / "xWebMLProject.xsd");
+    boost::filesystem::copy( sourceSchema / "xWebMLTemplate.xsd",   schemapath / "xWebMLTemplate.xsd");
+    boost::filesystem::copy( sourceSchema / "xWebMLLinkList.xsd",   schemapath / "xWebMLLinkList.xsd");
 
     try {
-        _projectFile = xWebML::xWebProject(_projectFilePath.toLocal8Bit().constData());
+        _projectFile = xWebML::xWebProject(_projectFilePath);
     } catch (const xml_schema::exception& ex) {
-      std::stringstream stream;
-      stream << ex;
-      QString str = QString::fromStdString(stream.str());
-      mandraworks::core::log::Log::error(QString("xml Parser error: %1").arg( str.replace("\n","")));
+        std::cout << "xml Parser error: ";
+        std::cout << ex << std::endl;
         return false;
     }
 
 
-    xWebProcessContext context(_projectFile->Settings());
+    xWebProcessContext context(_projectFile->Settings(), basefolder.string());
 
     if ( prepareOutputFolder(context) == false ) {
-        mandraworks::core::log::Log::error(QString("Prepare output folder faild: %1").arg(_projectFilePath));
+        std::cout << "Prepare output folder faild: " << _projectFilePath<< std::endl;
         return false;
     }
 
     if ( processContent(context, _projectFile->Content()) == false ) {
-        mandraworks::core::log::Log::error(QString("Process content faild: %1").arg(_projectFilePath));
+        std::cout << "Process content faild: " << _projectFilePath << std::endl;
         return false;
     }
 
-    mandraworks::core::log::Log::info(QString("xWebProcessor succedded"));
+    std::cout << "xWebProcessor succedded" << std::endl;
+
+    boost::filesystem::current_path(prevWorking);
 
     return true;
 }
 
 bool xWebProcessor::prepareOutputFolder(xWebProcessContext& context) {
-    mandraworks::core::log::Log::info(QString("Prepare outputfolder"));
+    std::cout << "Prepare outputfolder" << std::endl;
 
     context.initCurrentFolder();
 
-    mandraworks::core::log::Log::info(QString("Outputfolder: %1").arg(context.currentFolder()));
-    //mandraworks::core::log::Log::info(QString("Clean outputfolder..."));
+    std::cout << "Outputfolder: " << context.currentFolder() << std::endl;
 
-    QString outputFolderPath = context.currentFolder();
+    std::string outputFolderPath = context.currentFolder();
 
-    //mandraworks::core::system::SystemLib::rmFolder(outputFolderPath);
-
-    QDir dir(outputFolderPath);
-
-    if ( dir.exists() == false )
-      dir.mkpath(outputFolderPath);
+    if ( boost::filesystem::exists(outputFolderPath) == false )
+        boost::filesystem::create_directory(outputFolderPath);
 
     return true;
 }
@@ -150,7 +153,7 @@ bool xWebProcessor::processContent(xWebProcessContext& context, xWebML::FolderTy
 
 bool xWebProcessor::processFolder(xWebProcessContext& context, xWebML::FolderType& folder) {
 
-    QString folderName = QString(folder.Name().c_str());
+    std::string folderName = folder.Name();
 
     context.enqueueFolder(folderName);
 
@@ -171,69 +174,29 @@ bool xWebProcessor::processFolder(xWebProcessContext& context, xWebML::FolderTyp
 
 bool xWebProcessor::processStaticFolder(xWebProcessContext& context, xWebML::StaticFolderType& staticFolder) {
 
-    QString folderName = QString(staticFolder.Name().c_str());
-    QString currentFolder = QString("%1/%2").arg(context.currentFolder()).arg(folderName);
+    std::string folderName = staticFolder.Name();
+    boost::filesystem::path currentFolder;
 
-    QDir dir(currentFolder);
-
-    if ( dir.exists())
-      mandraworks::core::system::SystemLib::rmFolder(currentFolder);
-
-    dir.mkpath(currentFolder);
-
-    QString sourceFolder = QString(staticFolder.SourceFolder().c_str());
-
-    QDir dir2(sourceFolder);
-    QFileInfoList entries = dir2.entryInfoList(QDir::AllEntries|QDir::NoDotAndDotDot);
-
-    QString absSourceFolder = dir2.absolutePath();
-
-    for ( int i=0; i<entries.count(); i++) {
-        QFileInfo fileInfo = entries.at(i);
-
-        QString itemPath = fileInfo.absoluteFilePath();
-        QString relItemPath = itemPath.replace(absSourceFolder, "");
-
-        QString newItemPath = QString("%1/%2").arg(currentFolder).arg(relItemPath);
-
-        if ( fileInfo.isDir() == true ) {
-            dir.mkpath(newItemPath);
-            processStaticFolder(context, fileInfo.absoluteFilePath(), newItemPath);
-        }
-        else if ( fileInfo.isFile() == true ) {
-            QFile::copy(fileInfo.absoluteFilePath(), newItemPath);
-        }
+    try
+    {
+        currentFolder= boost::filesystem::path(context.currentFolder()) / folderName ;
+    }
+    catch (boost::filesystem::filesystem_error const &ex)
+    {
+        std::cout << "ERROR: " << ex.what() << std::endl;
+        return false;
     }
 
-    return true;
-}
+    if ( boost::filesystem::exists(currentFolder) == true)
+        boost::filesystem::remove_all(currentFolder);
 
-bool xWebProcessor::processStaticFolder(xWebProcessContext& context, QString sourceFolder, QString outputFolder) {
-    QString currentFolder = sourceFolder;
+    //boost::filesystem::create_directory(currentFolder);
 
-    QDir dir;
+    boost::filesystem::path sourceFolder = boost::filesystem::canonical(
+                boost::filesystem::path(context.workingFolder()) / staticFolder.SourceFolder() );
 
-    QDir dir2(sourceFolder);
-    QFileInfoList entries = dir2.entryInfoList(QDir::AllEntries|QDir::NoDotAndDotDot);
-
-    QString absSourceFolder = dir2.absolutePath();
-
-    for ( int i=0; i<entries.count(); i++) {
-        QFileInfo fileInfo = entries.at(i);
-
-        QString itemPath = fileInfo.absoluteFilePath();
-        QString relItemPath = itemPath.replace(absSourceFolder, "");
-
-        QString newItemPath = QString("%1/%2").arg(outputFolder).arg(relItemPath);
-
-        if ( fileInfo.isDir() == true ) {
-            dir.mkpath(newItemPath);
-            processStaticFolder(context, fileInfo.absoluteFilePath(), newItemPath);
-        }
-        else if ( fileInfo.isFile() == true ) {
-            QFile::copy(fileInfo.absoluteFilePath(), newItemPath);
-        }
-    }
+    if ( !copyFolder(sourceFolder, currentFolder) )
+        return false;
 
     return true;
 }
@@ -242,6 +205,52 @@ bool xWebProcessor::processFileItem(xWebProcessContext& context, xWebML::FileIte
 
     xWebFileItemProcessor fileItemProcessor(fileItem);
     fileItemProcessor.run(context);
+
+    return true;
+}
+
+bool xWebProcessor::copyFolder(boost::filesystem::path sourcefolder, boost::filesystem::path destFolder) {
+    try
+    {
+        if ( !boost::filesystem::exists(sourcefolder) || !boost::filesystem::is_directory(sourcefolder)) {
+            std::cout << "Source folder " << sourcefolder.string() << " do not exists or is not a directory." << std::endl;
+            return false;
+        }
+
+        if ( boost::filesystem::exists(destFolder) ) {
+            std::cout << "Destination folder " << destFolder.string() << " already exists." << std::endl;
+            return false;
+        }
+
+        if ( !boost::filesystem::create_directory(destFolder)) {
+            std::cout << "Unable to create destination directory " << destFolder.string() << std::endl;
+            return false;
+        }
+    }
+    catch (boost::filesystem::filesystem_error const &ex ) {
+        std::cout << "ERROR: " << ex.what() << std::endl;
+        return false;
+    }
+
+    // Iterate through the source directory
+    for( boost::filesystem::directory_iterator file(sourcefolder); file != boost::filesystem::directory_iterator(); ++file ) {
+
+        try {
+            boost::filesystem::path current = file->path();
+
+            if ( boost::filesystem::is_directory(current) == true ) {
+                if ( !copyFolder(current, destFolder / current.filename()) )
+                    return false;
+            }
+            else {
+                boost::filesystem::copy(current, destFolder / current.filename());
+            }
+        }
+        catch (boost::filesystem::filesystem_error const &ex ) {
+            std::cout << "ERROR: " << ex.what() << std::endl;
+            return false;
+        }
+    }
 
     return true;
 }
