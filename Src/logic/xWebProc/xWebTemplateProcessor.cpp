@@ -10,6 +10,7 @@
 
 #include <fstream>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include "xWebMLTemplate.hxx"
 #include "xWebMLLinkList.hxx"
@@ -35,19 +36,19 @@ xWebTemplateProcessor::~xWebTemplateProcessor() {
 
 }
 
-void xWebTemplateProcessor::processString(QString xmlData, QTextStream& outStream) {
-    QString startTags = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+void xWebTemplateProcessor::processString(std::string xmlData, std::ofstream& outStream) {
+    std::string startTags = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
             "<xWeb:String xmlns:xWeb=\"http://www.pspsmartsoft.com/xWebML\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.pspsmartsoft.com/xWebML Schemas/xWebMLTemplate.xsd\">";
-    QString xmlCompleteData = xmlData;
+    std::string xmlCompleteData = xmlData;
 
-    xmlCompleteData = xmlCompleteData.replace("<xWeb:String>", startTags);
+    boost::algorithm::replace_all( xmlCompleteData, "<xWeb:String>", startTags);
 
-    std::stringstream stream(xmlCompleteData.toLocal8Bit().constData());
+    std::stringstream stream(xmlCompleteData);
 
     try {
         std::auto_ptr<xWebML::StringType> xmlString = xWebML::String(stream);
 
-        outStream << QString::fromStdString(_context->getString(xmlString->c_str()));
+        outStream << _context->getString(xmlString->c_str());
 
     } catch (const xml_schema::exception& ex) {
         logException(ex);
@@ -55,28 +56,28 @@ void xWebTemplateProcessor::processString(QString xmlData, QTextStream& outStrea
     }
 }
 
-void xWebTemplateProcessor::processContentLink(QString xmlData, QTextStream& outStream) {
-    QString startTags = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+void xWebTemplateProcessor::processContentLink(std::string xmlData, std::ofstream& outStream) {
+    std::string startTags = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
             "<xWeb:ContentLink xmlns:xWeb=\"http://www.pspsmartsoft.com/xWebML\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.pspsmartsoft.com/xWebML Schemas/xWebMLTemplate.xsd\">";
-    QString xmlCompleteData = xmlData;
+    std::string xmlCompleteData = xmlData;
 
-    xmlCompleteData = xmlCompleteData.replace("<xWeb:ContentLink>", startTags);
+    boost::algorithm::replace_all( xmlCompleteData, "<xWeb:ContentLink>", startTags);
 
-    std::stringstream stream(xmlCompleteData.toLocal8Bit().constData());
+    std::stringstream stream(xmlCompleteData);
 
     try {
         std::auto_ptr<xWebML::ContentLinkType> xmlContentLink = xWebML::ContentLink(stream);
 
-        QString folder = QString(xmlContentLink->Folder().c_str());
-        QString fileName = QString(xmlContentLink->FileName().c_str());
-        QString contentFileName = QString::fromStdString(_context->workingFolder());
+        std::string folder = xmlContentLink->Folder().c_str();
+        std::string fileName = xmlContentLink->FileName().c_str();
+        std::string contentFileName = _context->workingFolder();
 
         contentFileName.append("/");
         contentFileName.append(folder);
-        contentFileName.append(QString::fromStdString(_context->contentPrefix()));
+        contentFileName.append(_context->contentPrefix());
         contentFileName.append(fileName);
 
-        _context->setCurrentContent(contentFileName.toLocal8Bit().constData());
+        _context->setCurrentContent(contentFileName);
 
     } catch (const xml_schema::exception& ex) {
         logException(ex);
@@ -85,21 +86,19 @@ void xWebTemplateProcessor::processContentLink(QString xmlData, QTextStream& out
 
 }
 
-void xWebTemplateProcessor::processContent(QString xmlData, QTextStream& outStream) {
-    QString startTags = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+void xWebTemplateProcessor::processContent(std::string xmlData, std::ofstream& outStream) {
+    std::string startTags = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
             "<xWeb:Content xmlns:xWeb=\"http://www.pspsmartsoft.com/xWebML\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.pspsmartsoft.com/xWebML Schemas/xWebMLTemplate.xsd\">";
-    QString xmlCompleteData = xmlData;
+    std::string xmlCompleteData = xmlData;
 
-    xmlCompleteData = xmlCompleteData.replace("<xWeb:Content>", startTags);
+    boost::algorithm::replace_all(xmlCompleteData, "<xWeb:Content>", startTags);
 
-    std::stringstream stream(xmlCompleteData.toLocal8Bit().constData());
+    std::stringstream stream(xmlCompleteData);
 
     try {
         std::auto_ptr<xWebML::ContentType> xmlContent = xWebML::Content(stream);
 
-        QString content = QString::fromStdString(_context->getContent(xmlContent->c_str()));
-
-        outStream << content;
+        outStream << _context->getContent(xmlContent->c_str());
 
     } catch (const xml_schema::exception& ex) {
         logException(ex);
@@ -108,39 +107,39 @@ void xWebTemplateProcessor::processContent(QString xmlData, QTextStream& outStre
 }
 
 
-void xWebTemplateProcessor::processMenu(QString xmlData, QTextStream& outStream) {
-    QString startTags = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+void xWebTemplateProcessor::processMenu(std::string xmlData, std::ofstream& outStream) {
+    std::string startTags = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
             "<xWeb:Menu xmlns:xWeb=\"http://www.pspsmartsoft.com/xWebML\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.pspsmartsoft.com/xWebML Schemas/xWebMLTemplate.xsd\">";
-    QString xmlCompleteData = xmlData;
+    std::string xmlCompleteData = xmlData;
 
-    xmlCompleteData = xmlCompleteData.replace("<xWeb:Menu>", startTags);
+    boost::algorithm::replace_all(xmlCompleteData, "<xWeb:Menu>", startTags);
 
-    std::stringstream stream(xmlCompleteData.toLocal8Bit().constData());
+    std::stringstream stream(xmlCompleteData);
 
     try {
         std::auto_ptr<xWebML::MenuType> xmlMenu = xWebML::Menu(stream);
 
-        QString templateFileName = QString(xmlMenu->TemplateFile().c_str());
-        QString linkListFileName = QString(xmlMenu->LinkListFile().c_str());
+        std::string templateFileName = xmlMenu->TemplateFile().c_str();
+        std::string linkListFileName = xmlMenu->LinkListFile().c_str();
 
-        QString subTemplateFileName;
+        std::string subTemplateFileName;
 
         if ( xmlMenu->SubTemplateFile().present() == true ) {
-            subTemplateFileName = QString(xmlMenu->SubTemplateFile().get().c_str());
+            subTemplateFileName = xmlMenu->SubTemplateFile().get().c_str();
         }
         else {
             subTemplateFileName = templateFileName;
         }
 
-        QString linkListFile = QString::fromStdString(_context->workingFolder());
+        std::string linkListFile = _context->workingFolder();
         linkListFile.append("/");
         linkListFile.append(linkListFileName);
 
-        QString templateFile = QString::fromStdString(_context->workingFolder());
+        std::string templateFile = _context->workingFolder();
         templateFile.append("/");
         templateFile.append(templateFileName);
 
-        std::auto_ptr<xWebML::LinkListType> xmlLinkList = xWebML::LinkList(linkListFile.toLocal8Bit().constData());
+        std::auto_ptr<xWebML::LinkListType> xmlLinkList = xWebML::LinkList(linkListFile);
 
         xWebML::LinkListType::LinkEntry_iterator it = xmlLinkList->LinkEntry().begin();
 
@@ -153,9 +152,9 @@ void xWebTemplateProcessor::processMenu(QString xmlData, QTextStream& outStream)
         while ( it != xmlLinkList->LinkEntry().end() ) {
             ctemplate::TemplateDictionary dict("LinkEntry");
 
-            QString link = QString(it->Link().c_str());
+            std::string link = it->Link().c_str();
 
-            ctemplate::Template* linkTpl = ctemplate::Template::StringToTemplate(link.toLocal8Bit().constData(), link.length(), ctemplate::DO_NOT_STRIP);
+            ctemplate::Template* linkTpl = ctemplate::Template::StringToTemplate(link.c_str(), link.length(), ctemplate::DO_NOT_STRIP);
 
             std::string linkOutput;
             linkTpl->Expand(&linkOutput, &dictLink);
@@ -170,9 +169,9 @@ void xWebTemplateProcessor::processMenu(QString xmlData, QTextStream& outStream)
 
             if ( it->SubLinks().present() == true ) {
                 xWebML::LinkListType xmlSubLinkList = it->SubLinks().get();
-                QString subLinks;
+                std::string subLinks;
                 processSubMenu(xmlSubLinkList, subTemplateFileName, subLinks);
-                dict.SetValue("SubLinks", subLinks.toLocal8Bit().constData());
+                dict.SetValue("SubLinks", subLinks);
                 dict.ShowSection("Sub_Sec");
             }
 
@@ -187,12 +186,12 @@ void xWebTemplateProcessor::processMenu(QString xmlData, QTextStream& outStream)
             if ( it != xmlLinkList->LinkEntry().end() )
                 dict.ShowSection("Sep_Sec");
 
-            ctemplate::Template* tpl = ctemplate::Template::GetTemplate(templateFile.toLocal8Bit().constData(), ctemplate::DO_NOT_STRIP);
+            ctemplate::Template* tpl = ctemplate::Template::GetTemplate(templateFile, ctemplate::DO_NOT_STRIP);
 
             std::string output;
             tpl->Expand(&output, &dict);
 
-            outStream << QString::fromUtf8(output.c_str()) << "\n";
+            outStream << output.c_str() << "\n";
         }
 
     } catch (const xml_schema::exception& ex) {
@@ -201,14 +200,14 @@ void xWebTemplateProcessor::processMenu(QString xmlData, QTextStream& outStream)
     }
 }
 
-void xWebTemplateProcessor::processIncludeFile(QString xmlData, QTextStream& outStream) {
-    QString startTags = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+void xWebTemplateProcessor::processIncludeFile(std::string xmlData, std::ofstream& outStream) {
+    std::string startTags = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
             "<xWeb:IncludeFile xmlns:xWeb=\"http://www.pspsmartsoft.com/xWebML\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.pspsmartsoft.com/xWebML Schemas/xWebMLTemplate.xsd\">";
-    QString xmlCompleteData = xmlData;
+    std::string xmlCompleteData = xmlData;
 
-    xmlCompleteData = xmlCompleteData.replace("<xWeb:IncludeFile>", startTags);
+    boost::algorithm::replace_all(xmlCompleteData, "<xWeb:IncludeFile>", startTags);
 
-    std::stringstream stream(xmlCompleteData.toLocal8Bit().constData());
+    std::stringstream stream(xmlCompleteData);
 
     try {
         std::auto_ptr<xWebML::IncludeFileType> xmlIncludeFile = xWebML::IncludeFile(stream);
@@ -243,7 +242,7 @@ void xWebTemplateProcessor::processIncludeFile(QString xmlData, QTextStream& out
 
         while (!file.eof()) {
             std::getline(file, line);
-            parser.parseLine(QString::fromStdString(line), outStream);
+            parser.parseLine(line, outStream);
         };
 
         file.close();
@@ -254,13 +253,13 @@ void xWebTemplateProcessor::processIncludeFile(QString xmlData, QTextStream& out
     }
 }
 
-void xWebTemplateProcessor::processSubMenu(xWebML::LinkListType& xmlSubLinks, QString templateFileName, QString& output) {
-    QTextStream stream(&output);
+void xWebTemplateProcessor::processSubMenu(xWebML::LinkListType& xmlSubLinks, std::string templateFileName, std::string& output) {
+    std::stringstream stream(output);
     try {
 
         std::string templateFile = _context->workingFolder();
         templateFile.append("/");
-        templateFile.append(templateFileName.toLocal8Bit().constData());
+        templateFile.append(templateFileName);
 
         xWebML::LinkListType::LinkEntry_iterator it = xmlSubLinks.LinkEntry().begin();
 
@@ -273,9 +272,9 @@ void xWebTemplateProcessor::processSubMenu(xWebML::LinkListType& xmlSubLinks, QS
         while ( it != xmlSubLinks.LinkEntry().end() ) {
             ctemplate::TemplateDictionary dict("LinkEntry");
 
-            QString link = QString(it->Link().c_str());
+            std::string link =it->Link().c_str();
 
-            ctemplate::Template* linkTpl = ctemplate::Template::StringToTemplate(link.toLocal8Bit().constData(), link.length(), ctemplate::DO_NOT_STRIP);
+            ctemplate::Template* linkTpl = ctemplate::Template::StringToTemplate(link.c_str(), link.length(), ctemplate::DO_NOT_STRIP);
 
             std::string linkOutput;
             linkTpl->Expand(&linkOutput, &dictLink);
@@ -290,9 +289,9 @@ void xWebTemplateProcessor::processSubMenu(xWebML::LinkListType& xmlSubLinks, QS
 
             if ( it->SubLinks().present() == true ) {
                 xWebML::LinkListType xmlSubLinkList = it->SubLinks().get();
-                QString subLinks;
+                std::string subLinks;
                 processSubMenu(xmlSubLinkList, templateFileName, subLinks);
-                dict.SetValue("SubLinks", subLinks.toLocal8Bit().constData());
+                dict.SetValue("SubLinks", subLinks);
                 dict.ShowSection("Sub_Sec");
             }
 
@@ -309,10 +308,10 @@ void xWebTemplateProcessor::processSubMenu(xWebML::LinkListType& xmlSubLinks, QS
 
             ctemplate::Template* tpl = ctemplate::Template::GetTemplate(templateFile, ctemplate::DO_NOT_STRIP);
 
-            std::string output;
-            tpl->Expand(&output, &dict);
+            std::string temploutput;
+            tpl->Expand(&temploutput, &dict);
 
-            stream << QString::fromUtf8(output.c_str()) << "\n";
+            stream << temploutput.c_str() << "\n";
         }
 
     }
@@ -320,15 +319,20 @@ void xWebTemplateProcessor::processSubMenu(xWebML::LinkListType& xmlSubLinks, QS
         logException(ex);
         return;
     }
+
+    output = stream.str();
 }
 
 
 void xWebTemplateProcessor::logException(const xml_schema::exception& ex) {
     std::stringstream stream;
     stream << ex;
-    QString str = QString::fromStdString(stream.str());
-    QStringList lines = str.split("\n");
-    foreach( QString line, lines ) {
-        std::cout << line.toLocal8Bit().constData() << std::endl;
+    std::string str = stream.str();
+    std::vector<std::string> lines;
+    std::vector<std::string>::iterator line;
+    boost::algorithm::split( lines, str, boost::algorithm::is_any_of("\n"), boost::algorithm::token_compress_off);
+
+    for( line=lines.begin(); line!=lines.end(); line++ ) {
+        std::cout << *line << std::endl;
     }
 }

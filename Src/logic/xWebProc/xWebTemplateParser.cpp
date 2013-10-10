@@ -9,6 +9,9 @@
 
 #include <iostream>
 #include <fstream>
+#include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
 
 
 #include "xWebTemplateParser.h"
@@ -25,23 +28,23 @@ xWebTemplateParser::xWebTemplateParser() :
     _delegate(0)
 {
 
-    _xWebTags.append(STRING);
-    _xWebTags.append(CONTENTLINK);
-    _xWebTags.append(CONTENT);
-    _xWebTags.append(MENU);
-    _xWebTags.append(INCLUDEFILE);
+    _xWebTags.push_back(STRING);
+    _xWebTags.push_back(CONTENTLINK);
+    _xWebTags.push_back(CONTENT);
+    _xWebTags.push_back(MENU);
+    _xWebTags.push_back(INCLUDEFILE);
 }
 
 
-xWebTemplateParser::xWebTemplateParser(QString inputFilePath, QString outputFilePath) :
-    _delegate(0), _inputFilePath(inputFilePath), _outputFilePath(outputFilePath)
+xWebTemplateParser::xWebTemplateParser(std::string inputFilePath, std::string outputFilePath) :
+    _inputFilePath(inputFilePath), _outputFilePath(outputFilePath), _delegate(0)
 {
 
-    _xWebTags.append(STRING);
-    _xWebTags.append(CONTENTLINK);
-    _xWebTags.append(CONTENT);
-    _xWebTags.append(MENU);
-    _xWebTags.append(INCLUDEFILE);
+    _xWebTags.push_back(STRING);
+    _xWebTags.push_back(CONTENTLINK);
+    _xWebTags.push_back(CONTENT);
+    _xWebTags.push_back(MENU);
+    _xWebTags.push_back(INCLUDEFILE);
 }
 
 xWebTemplateParser::~xWebTemplateParser() {
@@ -57,32 +60,32 @@ bool xWebTemplateParser::run() {
     _parserState = Idle;
     _currentElement.clear();
 
-    QFile sourceFile(_inputFilePath);
-    QFile targetFile(_outputFilePath);
+    std::ifstream sourceFile;
+    std::ofstream targetFile;
 
-    if ( sourceFile.exists() == false ) {
-        std::cout << " Source file do not exists: " << _inputFilePath.toLocal8Bit().constData() << std::endl;
+    if ( boost::filesystem::exists(_inputFilePath) == false ) {
+        std::cout << " Source file do not exists: " << _inputFilePath << std::endl;
         return false;
     }
 
-    if ( sourceFile.open(QIODevice::ReadOnly|QIODevice::Text) == false ) {
-        std::cout << " Could not open source file: " << _inputFilePath.toLocal8Bit().constData() << std::endl;
+    sourceFile.open(_inputFilePath.c_str(), std::ios::in);
+    if ( sourceFile.is_open() == false ) {
+        std::cout << " Could not open source file: " << _inputFilePath << std::endl;
         return false;
     }
 
-    if ( targetFile.open(QIODevice::WriteOnly|QIODevice::Truncate|QIODevice::Text) == false ) {
-        std::cout << " Could not open target file: " << _outputFilePath.toLocal8Bit().constData() << std::endl;
+    targetFile.open(_outputFilePath.c_str(), std::ios::out | std::ios::trunc);
+    if ( targetFile.is_open() == false ) {
+        std::cout << " Could not open target file: " << _outputFilePath << std::endl;
         return false;
     }
 
-    QString line;
-    QTextStream sourceStream(&sourceFile);
-    QTextStream targetStream(&targetFile);
+    std::string line;
 
-    do {
-        line = sourceStream.readLine();
-        parseLine(line, targetStream);
-    } while (!line.isNull());
+    while ( !sourceFile.eof() ) {
+        std::getline(sourceFile, line);
+        parseLine(line, targetFile);
+    }
 
     targetFile.close();
     sourceFile.close();
@@ -90,22 +93,23 @@ bool xWebTemplateParser::run() {
     return true;
 }
 
-void xWebTemplateParser::parseLine(QString line, QTextStream& outStream) {
+void xWebTemplateParser::parseLine(std::string line, std::ofstream& outStream) {
     if ( _parserState == Idle ) {
 
-        for ( int i=0; i<_xWebTags.count(); i++ ) {
-            QString startTag = getStartTag(_xWebTags.at(i));
-            if ( line.contains(startTag) == true ) {
+        std::list<std::string>::iterator it;
+        for ( it = _xWebTags.begin(); it != _xWebTags.end(); ++it ) {
+            std::string startTag = getStartTag(*it);
+            if ( line.find(startTag) != std::string::npos ) {
                 _currentElement.clear();
 
                 _parserState = InTag;
-                _currentTagIndex = i;
+                _currentTagIndex = it;
 
-                int index = line.indexOf(startTag);
+                std::string::size_type index = line.find(startTag);
 
-                outStream << line.mid(0, index);
+                outStream << line.substr(0, index);
 
-                line = line.mid(index);
+                line = line.substr(index);
 
                 // reneter state machine
                 parseLine(line, outStream);
@@ -116,19 +120,19 @@ void xWebTemplateParser::parseLine(QString line, QTextStream& outStream) {
         outStream << line << "\n";;
     }
     else if ( _parserState == InTag ) {
-        QString endTag = getEndTag(_xWebTags.at(_currentTagIndex));
-        if ( line.contains(endTag) == true ) {
+        std::string endTag = getEndTag(*_currentTagIndex);
+        if ( line.find(endTag) != std::string::npos ) {
 
-            int index = line.indexOf(endTag);
+            std::string::size_type index = line.find(endTag);
 
-            _currentElement.append(line.mid(0, index + endTag.length()));
+            _currentElement.append(line.substr(0, index + endTag.length()));
 
             processCurrentElement(outStream);
 
-            outStream << line.mid(index + endTag.length());
+            outStream << line.substr(index + endTag.length());
 
             _parserState = Idle;
-            _currentTagIndex = -1;
+            _currentTagIndex = _xWebTags.end();
         }
         else {
             _currentElement.append(line);
@@ -136,8 +140,8 @@ void xWebTemplateParser::parseLine(QString line, QTextStream& outStream) {
     }
 }
 
-void xWebTemplateParser::processCurrentElement(QTextStream& outStream) {
-    QString currentTag = _xWebTags.at(_currentTagIndex);
+void xWebTemplateParser::processCurrentElement(std::ofstream& outStream) {
+    std::string currentTag = *_currentTagIndex;
 
     if ( currentTag.compare(STRING) == 0 ) {
         if ( _delegate != 0 )
@@ -161,12 +165,12 @@ void xWebTemplateParser::processCurrentElement(QTextStream& outStream) {
     }
 }
 
-QString xWebTemplateParser::getStartTag(QString tag) {
-    QString str = QString("<%1>").arg(tag);
+std::string xWebTemplateParser::getStartTag(std::string tag) {
+    std::string str = boost::str( boost::format("<%1%>") % tag);
     return str;
 }
 
-QString xWebTemplateParser::getEndTag(QString tag) {
-    QString str = QString("</%1>").arg(tag);
+std::string xWebTemplateParser::getEndTag(std::string tag) {
+    std::string str = boost::str( boost::format("</%1%>") % tag);
     return str;
 }

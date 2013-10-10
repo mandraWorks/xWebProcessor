@@ -92,7 +92,7 @@ bool xWebFileItemProcessor::runTransform(xWebProcessContext& context) {
     boost::filesystem::path absSourceFilePath = boost::filesystem::path(context.workingFolder()) / _sourceFilePath;
     
     xWebTemplateProcessor processor(&context);
-    xWebTemplateParser parser(QString::fromStdString(absSourceFilePath.string()), QString::fromStdString(targetFile.string()));
+    xWebTemplateParser parser(absSourceFilePath.string(), targetFile.string());
     parser.setDelegate(&processor);
     
     if ( false == parser.run() ) {

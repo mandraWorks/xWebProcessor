@@ -6,8 +6,6 @@
 //  Copyright 2011 Smartkinematics. All rights reserved.
 //
 
-#include <QtCore>
-
 #include "xWebTemplateParser.h"
 #include "xWebMLLinkList.hxx"
 
@@ -19,14 +17,14 @@ public:
     xWebTemplateProcessor(xWebProcessContext* context);
     ~xWebTemplateProcessor();
     
-    void processString(QString xmlData, QTextStream& outStream);
-    void processContentLink(QString xmlData, QTextStream& outStream);
-    void processContent(QString xmlData, QTextStream& outStream);
-    void processMenu(QString xmlData, QTextStream& outStream);
-    void processIncludeFile(QString xmlData, QTextStream& outStream);
+    void processString(std::string xmlData, std::ofstream& outStream);
+    void processContentLink(std::string xmlData, std::ofstream& outStream);
+    void processContent(std::string xmlData, std::ofstream& outStream);
+    void processMenu(std::string xmlData, std::ofstream& outStream);
+    void processIncludeFile(std::string xmlData, std::ofstream& outStream);
 
 private:
-    void processSubMenu(xWebML::LinkListType& xmlSubLinks, QString templateFileName, QString& output);
+    void processSubMenu(xWebML::LinkListType& xmlSubLinks, std::string templateFileName, std::string& output);
 
     void logException(const xml_schema::exception& ex);
     
