@@ -7,9 +7,12 @@
 //
 
 
+#include <iostream>
 #include <fstream>
+#include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
 
-#include "mandraworks/core/log/Log.h"
 
 #include "xWebTemplateParser.h"
 
@@ -22,26 +25,26 @@
 
 
 xWebTemplateParser::xWebTemplateParser() :
-  _delegate(0)
+    _delegate(0)
 {
 
-  _xWebTags.append(STRING);
-  _xWebTags.append(CONTENTLINK);
-  _xWebTags.append(CONTENT);
-  _xWebTags.append(MENU);
-  _xWebTags.append(INCLUDEFILE);
+    _xWebTags.push_back(STRING);
+    _xWebTags.push_back(CONTENTLINK);
+    _xWebTags.push_back(CONTENT);
+    _xWebTags.push_back(MENU);
+    _xWebTags.push_back(INCLUDEFILE);
 }
 
 
-xWebTemplateParser::xWebTemplateParser(QString inputFilePath, QString outputFilePath) :
-  _delegate(0), _inputFilePath(inputFilePath), _outputFilePath(outputFilePath)
+xWebTemplateParser::xWebTemplateParser(std::string inputFilePath, std::string outputFilePath) :
+    _inputFilePath(inputFilePath), _outputFilePath(outputFilePath), _delegate(0)
 {
 
-  _xWebTags.append(STRING);
-  _xWebTags.append(CONTENTLINK);
-  _xWebTags.append(CONTENT);
-  _xWebTags.append(MENU);
-  _xWebTags.append(INCLUDEFILE);
+    _xWebTags.push_back(STRING);
+    _xWebTags.push_back(CONTENTLINK);
+    _xWebTags.push_back(CONTENT);
+    _xWebTags.push_back(MENU);
+    _xWebTags.push_back(INCLUDEFILE);
 }
 
 xWebTemplateParser::~xWebTemplateParser() {
@@ -49,124 +52,125 @@ xWebTemplateParser::~xWebTemplateParser() {
 }
 
 void xWebTemplateParser::init() {
-  _parserState = Idle;
-  _currentElement.clear();
+    _parserState = Idle;
+    _currentElement.clear();
 }
 
 bool xWebTemplateParser::run() {
-  _parserState = Idle;
-  _currentElement.clear();
+    _parserState = Idle;
+    _currentElement.clear();
 
-  QFile sourceFile(_inputFilePath);
-  QFile targetFile(_outputFilePath);
+    std::ifstream sourceFile;
+    std::ofstream targetFile;
 
-  if ( sourceFile.exists() == false ) {
-    mandraworks::core::log::Log::error(QString(" Source file do not exists: %1").arg(_inputFilePath));
-    return false;
-  }
-
-  if ( sourceFile.open(QIODevice::ReadOnly|QIODevice::Text) == false ) {
-    mandraworks::core::log::Log::error(QString(" Could not open source file: %1").arg(_inputFilePath));
-    return false;
-  }
-
-  if ( targetFile.open(QIODevice::WriteOnly|QIODevice::Truncate|QIODevice::Text) == false ) {
-    mandraworks::core::log::Log::error(QString(" Could not open target file: %1").arg(_inputFilePath));
-    return false;
-  }
-
-  QString line;
-  QTextStream sourceStream(&sourceFile);
-  QTextStream targetStream(&targetFile);
-
-  do {
-    line = sourceStream.readLine();
-    parseLine(line, targetStream);
-  } while (!line.isNull());
-
-  targetFile.close();
-  sourceFile.close();
-
-  return true;
-}
-
-void xWebTemplateParser::parseLine(QString line, QTextStream& outStream) {
-  if ( _parserState == Idle ) {
-
-    for ( int i=0; i<_xWebTags.count(); i++ ) {
-      QString startTag = getStartTag(_xWebTags.at(i));
-      if ( line.contains(startTag) == true ) {
-        _currentElement.clear();
-
-        _parserState = InTag;
-        _currentTagIndex = i;
-
-        int index = line.indexOf(startTag);
-
-        outStream << line.mid(0, index);
-
-        line = line.mid(index);
-
-        // reneter state machine
-        parseLine(line, outStream);
-        return;
-      }
+    if ( boost::filesystem::exists(_inputFilePath) == false ) {
+        std::cout << " Source file do not exists: " << _inputFilePath << std::endl;
+        return false;
     }
 
-    outStream << line << "\n";;
-  }
-  else if ( _parserState == InTag ) {
-    QString endTag = getEndTag(_xWebTags.at(_currentTagIndex));
-    if ( line.contains(endTag) == true ) {
-
-      int index = line.indexOf(endTag);
-
-      _currentElement.append(line.mid(0, index + endTag.length()));
-
-      processCurrentElement(outStream);
-
-      outStream << line.mid(index + endTag.length());
-
-      _parserState = Idle;
-      _currentTagIndex = -1;
+    sourceFile.open(_inputFilePath.c_str(), std::ios::in);
+    if ( sourceFile.is_open() == false ) {
+        std::cout << " Could not open source file: " << _inputFilePath << std::endl;
+        return false;
     }
-    else {
-      _currentElement.append(line);
+
+    targetFile.open(_outputFilePath.c_str(), std::ios::out | std::ios::trunc);
+    if ( targetFile.is_open() == false ) {
+        std::cout << " Could not open target file: " << _outputFilePath << std::endl;
+        return false;
     }
-  }
+
+    std::string line;
+
+    while ( !sourceFile.eof() ) {
+        std::getline(sourceFile, line);
+        parseLine(line, targetFile);
+    }
+
+    targetFile.close();
+    sourceFile.close();
+
+    return true;
 }
 
-void xWebTemplateParser::processCurrentElement(QTextStream& outStream) {
-  QString currentTag = _xWebTags.at(_currentTagIndex);
+void xWebTemplateParser::parseLine(std::string line, std::ofstream& outStream) {
+    if ( _parserState == Idle ) {
 
-  if ( currentTag.compare(STRING) == 0 ) {
-    if ( _delegate != 0 )
-      _delegate->processString(_currentElement, outStream);
-  }
-  else if ( currentTag.compare(CONTENTLINK) == 0 ) {
-    if ( _delegate != 0 )
-      _delegate->processContentLink(_currentElement, outStream);
-  }
-  else if ( currentTag.compare(CONTENT) == 0 ) {
-    if ( _delegate != 0 )
-      _delegate->processContent(_currentElement, outStream);
-  }
-  else if ( currentTag.compare(MENU) == 0 ) {
-    if ( _delegate != 0 )
-      _delegate->processMenu(_currentElement, outStream);
-  }
-  else if ( currentTag.compare(INCLUDEFILE) == 0 ) {
-    if ( _delegate != 0 )
-      _delegate->processIncludeFile(_currentElement, outStream);
-  }
+        std::list<std::string>::iterator it;
+        for ( it = _xWebTags.begin(); it != _xWebTags.end(); ++it ) {
+            std::string startTag = getStartTag(*it);
+            if ( line.find(startTag) != std::string::npos ) {
+                _currentElement.clear();
+
+                _parserState = InTag;
+                _currentTagIndex = it;
+
+                std::string::size_type index = line.find(startTag);
+
+                outStream << line.substr(0, index);
+
+                line = line.substr(index);
+
+                // reneter state machine
+                parseLine(line, outStream);
+                return;
+            }
+        }
+
+        outStream << line << "\n";;
+    }
+    else if ( _parserState == InTag ) {
+        std::string endTag = getEndTag(*_currentTagIndex);
+        if ( line.find(endTag) != std::string::npos ) {
+
+            std::string::size_type index = line.find(endTag);
+
+            _currentElement.append(line.substr(0, index + endTag.length()));
+
+            processCurrentElement(outStream);
+
+            outStream << line.substr(index + endTag.length());
+
+            _parserState = Idle;
+            _currentTagIndex = _xWebTags.end();
+        }
+        else {
+            _currentElement.append(line);
+        }
+    }
 }
 
-QString xWebTemplateParser::getStartTag(QString tag) {
-  QString str = QString("<%1>").arg(tag);
-  return str;
+void xWebTemplateParser::processCurrentElement(std::ofstream& outStream) {
+    std::string currentTag = *_currentTagIndex;
+
+    if ( currentTag.compare(STRING) == 0 ) {
+        if ( _delegate != 0 )
+            _delegate->processString(_currentElement, outStream);
+    }
+    else if ( currentTag.compare(CONTENTLINK) == 0 ) {
+        if ( _delegate != 0 )
+            _delegate->processContentLink(_currentElement, outStream);
+    }
+    else if ( currentTag.compare(CONTENT) == 0 ) {
+        if ( _delegate != 0 )
+            _delegate->processContent(_currentElement, outStream);
+    }
+    else if ( currentTag.compare(MENU) == 0 ) {
+        if ( _delegate != 0 )
+            _delegate->processMenu(_currentElement, outStream);
+    }
+    else if ( currentTag.compare(INCLUDEFILE) == 0 ) {
+        if ( _delegate != 0 )
+            _delegate->processIncludeFile(_currentElement, outStream);
+    }
 }
 
-QString xWebTemplateParser::getEndTag(QString tag) {
-  QString str = QString("</%1>").arg(tag);
-  return str;
+std::string xWebTemplateParser::getStartTag(std::string tag) {
+    std::string str = boost::str( boost::format("<%1%>") % tag);
+    return str;
+}
+
+std::string xWebTemplateParser::getEndTag(std::string tag) {
+    std::string str = boost::str( boost::format("</%1%>") % tag);
+    return str;
 }
