@@ -5,7 +5,7 @@
 //  Created by Matthias Müller on 02.05.11.
 //  Copyright 2011 Smartkinematics. All rights reserved.
 //
-#include <stream.h>
+#include <iostream>
 #include <xsd/cxx/pre.hxx>
 #include <boost/foreach.hpp>
 
