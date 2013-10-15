@@ -42,4 +42,4 @@ add_executable(xWebProcessor
   ${xWebProcessor_SRCS}
 )
 
-target_link_libraries(xWebProcessor ${XERCES_INSTALL_LIB_PATH})
+#target_link_libraries(xWebProcessor ${XERCES_INSTALL_LIB_PATH})
