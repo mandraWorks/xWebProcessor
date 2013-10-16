@@ -31,7 +31,6 @@ set( xWebProcessor_HDRS
 )
 
 set( IncludeDirs
-  ${XSD_INSTALL_INCLUDE_PATH}
   ${SRCAUTOGEN_PATH}
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
@@ -42,4 +41,4 @@ add_executable(xWebProcessor
   ${xWebProcessor_SRCS}
 )
 
-#target_link_libraries(xWebProcessor ${XERCES_INSTALL_LIB_PATH})
+target_link_libraries(xWebProcessor ${XERCERS_LIB} ${Boost_LIBRARIES} ${CTEMPLATE_LIB})
