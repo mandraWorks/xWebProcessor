@@ -8,16 +8,18 @@
 #ifndef XWEBPROCESSOR_HEADER
 #define XWEBPROCESSOR_HEADER
 
-#include <QtCore>
+#include <string>
+#include <list>
+#include <fstream>
 
 
 class xWebTemplateParserDelegate {
 public:
-  virtual void processString(QString xmlData, QTextStream& outStream) = 0;
-  virtual void processContentLink(QString xmlData, QTextStream& outStream) = 0;
-  virtual void processContent(QString xmlData, QTextStream& outStream) = 0;
-  virtual void processMenu(QString xmlData, QTextStream& outStream) = 0;
-  virtual void processIncludeFile(QString xmlData, QTextStream& outStream) = 0;
+  virtual void processString(std::string xmlData, std::ofstream& outStream) = 0;
+  virtual void processContentLink(std::string xmlData, std::ofstream& outStream) = 0;
+  virtual void processContent(std::string xmlData, std::ofstream& outStream) = 0;
+  virtual void processMenu(std::string xmlData, std::ofstream& outStream) = 0;
+  virtual void processIncludeFile(std::string xmlData, std::ofstream& outStream) = 0;
 };
 
 
@@ -30,30 +32,30 @@ class xWebTemplateParser {
 
 public:
   xWebTemplateParser();
-  xWebTemplateParser(QString inputFilePath, QString outputFilePath);
+  xWebTemplateParser(std::string inputFilePath, std::string outputFilePath);
   ~xWebTemplateParser();
 
   void setDelegate(xWebTemplateParserDelegate* delegate) { _delegate = delegate; }
 
   void init();
   bool run();
-  void parseLine(QString line, QTextStream& outStream);
+  void parseLine(std::string line, std::ofstream& outStream);
 
 private:
-  void processCurrentElement(QTextStream& outStream);
+  void processCurrentElement(std::ofstream& outStream);
 
-  QString getStartTag(QString tag);
-  QString getEndTag(QString tag);
+  std::string getStartTag(std::string tag);
+  std::string getEndTag(std::string tag);
 
 private:
-  QString _inputFilePath;
-  QString _outputFilePath;
-  QStringList _xWebTags;
+  std::string _inputFilePath;
+  std::string _outputFilePath;
+  std::list<std::string> _xWebTags;
 
   int _parserState;
-  int _currentTagIndex;
+  std::list<std::string>::iterator _currentTagIndex;
 
-  QString _currentElement;
+  std::string _currentElement;
 
   xWebTemplateParserDelegate* _delegate;
 };

@@ -6,7 +6,8 @@
 //  Copyright 2011 Smartkinematics. All rights reserved.
 //
 #include <iostream>
-#include <QtCore>
+#include <string>
+#include <map>
 
 namespace xWebML {
     class StringListType;
@@ -14,20 +15,27 @@ namespace xWebML {
 
 
 class xWebStringList {
+    typedef std::map<std::string,std::string> Container;
   
 public:
-  xWebStringList(QString contentFile);
+  xWebStringList(std::string contentFile);
     xWebStringList(xWebML::StringListType& list);
     ~xWebStringList();
     
-    void init(QString contentFile);
+    void init(std::string contentFile);
     void init(xWebML::StringListType& list);
     
-    bool contains(QString key) const;
-    QString stringForKey(QString key) const;
+    bool contains(std::string key) const;
+    std::string stringForKey(std::string key) const;
 
-    QList<QString> keys() const;
+    void init();
+    bool more() const;
+    void next();
+
+    std::string key();
+    std::string value();
     
 private:
-    QMap<QString,QString> _data;
+    Container _data;
+    Container::iterator _iterator;
 };

@@ -5,3 +5,4 @@ Makefile
 *~
 /Src_autogen
 qrc_*
+*.txt.user
