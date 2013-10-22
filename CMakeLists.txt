@@ -3,6 +3,15 @@ cmake_minimum_required (VERSION 2.8.11)
 
 project(xWebProcessor)
 
+# version
+set ( xWebProcessor_MAJOR_VERSION 0)
+set ( xWebProcessor_MINOR_VERSION 1)
+set ( xWebProcessor_PATCH_VERSION 0)
+
+add_definitions( -DMAJOR_VERSION=${xWebProcessor_MAJOR_VERSION})
+add_definitions( -DMINOR_VERSION=${xWebProcessor_MINOR_VERSION})
+add_definitions( -DPATCH_VERSION=${xWebProcessor_PATCH_VERSION})
+
 # boost
 set(Boost_NO_SYSTEM_PATHS ON)
 set(BOOST_SEARCH_PATH CACHE PATH "Boost search path")
@@ -23,5 +32,11 @@ include_directories( ${XERCERS_INC})
 find_path( CTEMPLATE_INC ctemplate CTEMPLATE_INSTALL_INCLUDE_PATH)
 find_library( CTEMPLATE_LIB xercers CTEMPLATE_INSTALL_LIB_PATH)
 include_directories( ${CTEMPLATE_INC})
+
+# output directories in the binary tree
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${xWebProcessor_BINARY_DIR}/bin)
+
+# install directory
+set (INSTALL_BIN_DIR bin CACHE PATH "INstallation directory for the executable")
 
 add_subdirectory(Src)
