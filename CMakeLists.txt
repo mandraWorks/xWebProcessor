@@ -5,7 +5,7 @@ project(xWebProcessor)
 
 # version
 set ( xWebProcessor_MAJOR_VERSION 0)
-set ( xWebProcessor_MINOR_VERSION 1)
+set ( xWebProcessor_MINOR_VERSION 2)
 set ( xWebProcessor_PATCH_VERSION 0)
 
 add_definitions( -DMAJOR_VERSION=${xWebProcessor_MAJOR_VERSION})
