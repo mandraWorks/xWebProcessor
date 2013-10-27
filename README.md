@@ -4,7 +4,7 @@ In contrast to (old school) CMS systems,  modern web application do not rely any
 final complete html page entirely on the server side (like php, asp, jsp , etc.). Furthermore modern web application deliver only realtime data as ditionaries (json files) from a REST webservice and 
 realize the rendering of the html pages on the client side (browser, using javascript). This approach is technically very mature due to tremdeous progress of the modern javascript engins (Google V8).
 So only realtime data (frequently changed data) is traveling frequently through the network. All other data like translations, menu and page structure and so on, is generated offline and rendered 
-on the client side (send only once when loading the html pages and assests). The modification of this kind of information is managed by the publication and release cycle of the web application. 
+on the client side (send only once when loading the html, javascript, css and assests). The modification of this kind of information is managed by the publication and release cycle of the web application. 
 To work efficently with this approach, the use a static web 
 site generator is very recommande in order to handle web page structure and translations, tasks which had been done by the CMS sytem before.
 
