@@ -23,6 +23,15 @@ I use the follwing extension for the project file: xwebproj.xml. It is not manda
 
 ![Project Schema](https://raw.github.com/mandraWorks/xWebProcessor/s_doc_%2312/Doc/project.png "Project Schema")
 
+### The content files
+The content files contains the string list, in general the translations. Currently xWebProcessor supports to formats for the string list:
+- xWebStringList files (part of the xWebML)
+- strings files (Apple string resource files)
+
+The schema os the xWebML stringlist is as follows.
+
+![String List Schema](https://raw.github.com/mandraWorks/xWebProcessor/s_doc_%2312/Doc/stringlist.png "String List Schema")
+
 current Version 0.1.0
 
 Static web page generation base on XML.
