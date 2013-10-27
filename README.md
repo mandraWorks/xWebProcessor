@@ -21,7 +21,7 @@ All data processed by the xWebProcessor is presented as XML (embedded or file). 
 ### The project file
 I use the follwing extension for the project file: xwebproj.xml. It is not mandatory. In the following illustration you can see the schema o fthe project file.
 
-
+![Project Schema](https://raw.github.com/mandraWorks/xWebProcessor/s_doc_%2312/Doc/project.png "Project Schema")
 
 current Version 0.1.0
 
