@@ -13,7 +13,9 @@ Why implement another one? Actually it was not really mandatory. Other static we
 for two reasons: First: it was not a lot of effort (approxiamtly 2 days of work), second: It gaved me the possibility to adapte the markup language for the generation exactly to my needs.
 
 ## How does it work
+The xWebProcessor is a command line tool which has one parameter is input: the project file. The following illustration outlines the basic topologie of the files used during the static web site generation.
 
+(Doc/Overview.png "xWebProcessor and files")
 
 
 current Version 0.1.0
