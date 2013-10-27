@@ -17,6 +17,11 @@ The xWebProcessor is a command line tool which has one parameter is input: the p
 
 ![Overview](https://raw.github.com/mandraWorks/xWebProcessor/s_doc_%2312/Doc/Overview.png "xWebProcessor and files")
 
+All data processed by the xWebProcessor is presented as XML (embedded or file). In the following I will present the syntaxt of the this XML dialect (xWebML).
+### The project file
+I use the follwing extension for the project file: xwebproj.xml. It is not mandatory. In the following illustration you can see the schema o fthe project file.
+
+
 
 current Version 0.1.0
 
