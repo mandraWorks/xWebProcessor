@@ -15,7 +15,7 @@ for two reasons: First: it was not a lot of effort (approxiamtly 2 days of work)
 ## How does it work
 The xWebProcessor is a command line tool which has one parameter is input: the project file. The following illustration outlines the basic topologie of the files used during the static web site generation.
 
-![Overview](Doc/Overview.png "xWebProcessor and files")
+![Overview](/Doc/Overview.png "xWebProcessor and files")
 
 
 current Version 0.1.0
