@@ -6,11 +6,13 @@ realize the rendering of the html pages on the client side (browser, using javas
 So only realtime data (frequently changed data) is traveling frequently through the network. All other data like translations, menu and page structure and so on, is generated offline and rendered 
 on the client side (send only once when loading the html, javascript, css and assests). The modification of this kind of information is managed by the publication and release cycle of the web application. 
 To work efficently with this approach, the use a static web 
-site generator is very recommande in order to handle web page structure and translations, tasks which had been done by the CMS sytem before.
+site generator is recommand in order to handle web page structure and translations, tasks which had been done by the CMS sytem before.
 
 The xWebProcessor is the implementation of such static web site generator based on XML. The author is clearly aware that there are a lot of other static website generators on the market these days.
-Why implement another one? Actually it was not really mandatory. Other static web page generators are very powerful and in some areas maybe more efficent than the sWebProcessor. I implemented this tools
+Why implement another one? Actually it was not really mandatory. Other static web page generators are very powerful and in some areas maybe more efficent than the xWebProcessor. I implemented this tools
 for two reasons: First: it was not a lot of effort (approxiamtly 2 days of work), second: It gaved me the possibility to adapte the markup language for the generation exactly to my needs.
+
+## How does it work
 
 
 
@@ -18,7 +20,8 @@ current Version 0.1.0
 
 Static web page generation base on XML.
 
-# Requirements
+## Compilation
+### Requirements
 
 - **boost 1.54.0** (http://www.boost.org): 
 xWebProcessor uses boost for basic string anf file handling and for parsing the command line parameters.
