@@ -32,6 +32,20 @@ The schema os the xWebML stringlist is as follows.
 
 ![String List Schema](https://raw.github.com/mandraWorks/xWebProcessor/s_doc_%2312/Doc/stringlist.png "String List Schema")
 
+### The Templates
+#### The html fragments
+The html fragments contains html blocks which are assembled by the xWebProcessor to the final web pages. 
+These fragments can be injected with XML sections which are processed by the xWebProcessor. in the following I will
+present the different XML sections which can be embedded into the html code.
+
+##### Include file
+By placing an XML bloc which validates the following schema, you can indicate the xWebProcessor to include another file
+(cut and paste).
+
+![Include File Schema](https://raw.github.com/mandraWorks/xWebProcessor/s_doc_%2312/Doc/includefile.png "Include File Schema")
+
+
+
 current Version 0.1.0
 
 Static web page generation base on XML.
