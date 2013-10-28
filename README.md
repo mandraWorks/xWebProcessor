@@ -1,4 +1,4 @@
-# xWebProcessor
+# xWebProcessor (current Version 0.1.0)
 ## Introduction
 In contrast to (old school) CMS systems,  modern web application do not rely anymore on the paradigm to generate the 
 final complete html page entirely on the server side (like php, asp, jsp , etc.). Furthermore modern web application deliver only realtime data as ditionaries (json files) from a REST webservice and 
@@ -118,7 +118,6 @@ The tpl file defines a ctemplate for the rendering of each menu entry. See the f
 <li{{#Act_Sec}} class="active"{{/Act_Sec}}><a href="{{Link}}">{{Label}}</a></li>
 ```
 
-current Version 0.1.0
 
 Static web page generation base on XML.
 
