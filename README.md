@@ -56,6 +56,26 @@ Here a small code example:
 </div>
 ```
 
+##### Content link
+A content link activates a content file which is used in the following text of the html fragment for replacing 
+string or content entires with localized strings.
+
+![Content Link Schema](https://raw.github.com/mandraWorks/xWebProcessor/s_doc_%2312/Doc/contentlink.png "Content Link Schema")
+
+Here a small code example:
+
+```html
+</head>
+
+<xWeb:ContentLink>
+  <Folder>Content/</Folder>
+  <FileName>Common.xwebstringlist.xml</FileName>
+</xWeb:ContentLink>
+
+<body>
+```
+
+
 current Version 0.1.0
 
 Static web page generation base on XML.
