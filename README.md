@@ -44,7 +44,17 @@ By placing an XML bloc which validates the following schema, you can indicate th
 
 ![Include File Schema](https://raw.github.com/mandraWorks/xWebProcessor/s_doc_%2312/Doc/includefile.png "Include File Schema")
 
+Here a small code example:
 
+'''
+</div>
+  <div class="span2">
+    <xWeb:IncludeFile>
+      <File>Templates/actions.html</File>
+    </xWeb:IncludeFile>
+  </div>
+</div>
+'''
 
 current Version 0.1.0
 
