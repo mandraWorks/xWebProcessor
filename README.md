@@ -137,6 +137,18 @@ The following web sites a rerealized with the xWebProcess. Feel free to browse t
 
 ### SFRF
 
-Link: http://ww.sfrf.ch
+Link: http://www.sfrf.ch
 
 Sources: https://github.com/mandraWorks/SFRFweb_dev
+
+### PSPsmartsoft
+
+Link: http://www.pspsmartsoft.com
+
+Sources: n.a. (for the moment)
+
+### Mandraworks
+
+Link: www.mandraworks.ch
+
+Sources: https://github.com/mandraWorks/mandraworks_dev
