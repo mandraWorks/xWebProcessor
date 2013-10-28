@@ -88,17 +88,35 @@ how to use a string identified by its key in your html fragment.
 
 
 ##### Menu
-In order to create a modulare and localized menu you need to create two xmlentities:
+In order to create a modulare and localized menu you need to create two XML entities:
 
 - a menu section in the html fragment
 - a link list file
 
-In the following you can see the XML section which creates a menu in the html fragement.
+In the following you can see the schema of the XML section which creates a menu in the html fragement.
 
 ![Menu Schema](https://raw.github.com/mandraWorks/xWebProcessor/s_doc_%2312/Doc/menu.png "Menu Schema")
 
+An example:
 
+```html
+<ul class="dropdown-menu">
+  <xWeb:Menu>
+    <TemplateFile>Templates/topHomeMenu.tpl</TemplateFile>
+    <LinkListFile>Templates/topHomeMenu.xweblinklist.xml</LinkListFile>
+  </xWeb:Menu>
+</ul>
+```
 
+The referenced link list file has the following XML schema:
+
+![Link List Schema](https://raw.github.com/mandraWorks/xWebProcessor/s_doc_%2312/Doc/linklist.png "Link List Schema")
+
+The tpl file defines a ctemplate for the rendering of each menu entry. See the following example for the content of such a tpl file:
+
+```html
+<li{{#Act_Sec}} class="active"{{/Act_Sec}}><a href="{{Link}}">{{Label}}</a></li>
+```
 
 current Version 0.1.0
 
