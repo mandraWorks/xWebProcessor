@@ -119,8 +119,6 @@ The tpl file defines a ctemplate for the rendering of each menu entry. See the f
 ```
 
 
-Static web page generation base on XML.
-
 ## Compilation
 ### Requirements
 
@@ -130,3 +128,15 @@ xWebProcessor uses boost for basic string anf file handling and for parsing the 
 xWebProcessor uses the excellent xsd tool in order to generated the xml schema - c++ bindings for xWebML (xWebMarkuplangauge).
 - **ctemplate 2.2** (http://code.google.com/p/ctemplate): 
 xWebProcessor uses the very efficient ctemplate library form Google for the basic templating, for example menu item generation.
+
+The xWebProcessor is compiled using cmake. Run cmake and enter the necessary path in order to find the required libraries listed above.
+
+
+## Examples
+The following web sites a rerealized with the xWebProcess. Feel free to browse the sources in order to evaluate the xWebProcessor.
+
+### SFRF
+
+Link: http://ww.sfrf.ch
+
+Sources: https://github.com/mandraWorks/SFRFweb_dev
