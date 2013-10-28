@@ -87,6 +87,19 @@ how to use a string identified by its key in your html fragment.
 ```
 
 
+##### Menu
+In order to create a modulare and localized menu you need to create two xmlentities:
+
+- a menu section in the html fragment
+- a link list file
+
+In the following you can see the XML section which creates a menu in the html fragement.
+
+![Menu Schema](https://raw.github.com/mandraWorks/xWebProcessor/s_doc_%2312/Doc/menu.png "Menu Schema")
+
+
+
+
 current Version 0.1.0
 
 Static web page generation base on XML.
