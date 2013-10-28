@@ -46,7 +46,7 @@ By placing an XML bloc which validates the following schema, you can indicate th
 
 Here a small code example:
 
-'''
+```html
 </div>
   <div class="span2">
     <xWeb:IncludeFile>
@@ -54,7 +54,7 @@ Here a small code example:
     </xWeb:IncludeFile>
   </div>
 </div>
-'''
+```
 
 current Version 0.1.0
 
