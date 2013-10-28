@@ -75,6 +75,17 @@ Here a small code example:
 <body>
 ```
 
+##### Content string
+Once you activate a content file you can use strings from this file. In the following example you can see 
+how to use a string identified by its key in your html fragment.
+
+```html
+<div class="citationbody">
+  <p class="citationtext justify"><xWeb:Content>FMStatement</xWeb:Content> </p>
+  <p class="citationname"><xWeb:Content>FMName</xWeb:Content> </p>
+</div>
+```
+
 
 current Version 0.1.0
 
