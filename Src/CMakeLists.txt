@@ -57,9 +57,9 @@ add_executable(xWebProcessor
   ${xWebProcessor_SRCS}
 )
 target_link_libraries(xWebProcessor
-  ${XERCERS_LIB}
+  ${XERCESC_LIBRARY}
   ${Boost_LIBRARIES}
-  ${CTEMPLATE_LIB}
+  ${CTEMPLATE_LIBRARIES}
 )
 
 add_dependencies( xWebProcessor ${generated_cxx_targets} ) 
