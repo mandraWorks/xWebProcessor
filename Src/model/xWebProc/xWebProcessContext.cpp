@@ -101,7 +101,7 @@ void xWebProcessContext::initCurrentFolder() {
 
   boost::filesystem::create_directory(currentFolder);
 
-  _currentFolder.push(currentFolder.string());
+  _currentFolder.push_back(currentFolder.string());
 }
 
 void xWebProcessContext::enqueueFolder(std::string folder) {
@@ -112,11 +112,11 @@ void xWebProcessContext::enqueueFolder(std::string folder) {
 
   std::cout << "New folder: " << newFolderPath << std::endl;
 
-  _currentFolder.push(newFolderPath.string());
+  _currentFolder.push_back(newFolderPath.string());
 }
 
 void xWebProcessContext::dequeueFolder() {
-  _currentFolder.pop();
+  _currentFolder.pop_back();
 }
 
 std::string xWebProcessContext::currentFolder() {

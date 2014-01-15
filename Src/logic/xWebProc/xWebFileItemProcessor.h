@@ -25,6 +25,7 @@ public:
     bool run(xWebProcessContext& context);
     
     bool runTransform(xWebProcessContext& context);
+    bool runCopy(xWebProcessContext& context);
     
 private:
     void initRun(xWebProcessContext& context);
