@@ -16,6 +16,11 @@
 #include "xWebStringsParser.h"
 
 
+xWebStringList::xWebStringList()
+{
+
+}
+
 xWebStringList::xWebStringList(std::string contentFile) {
   init(contentFile);
 }
@@ -62,6 +67,16 @@ void xWebStringList::init(xWebML::StringListType& list) {
         
         it++;
     }
+}
+
+void xWebStringList::override(const xWebStringList &other)
+{
+    _data.insert( other._data.begin(), other._data.end());
+}
+
+void xWebStringList::insert(const std::string &key, const std::string &value)
+{
+    _data.insert(std::pair<std::string, std::string>(key, value));
 }
 
 bool xWebStringList::contains(std::string key) const {

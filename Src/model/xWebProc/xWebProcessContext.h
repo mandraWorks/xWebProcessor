@@ -33,6 +33,7 @@ public:
 
   std::string getString(std::string key) const;
   std::string getContent(std::string key) const;
+  std::string resolveString(std::string value) const;
 
   std::string workingFolder() const;
 

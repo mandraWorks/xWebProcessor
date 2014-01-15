@@ -9,6 +9,7 @@
 #include <xsd/cxx/pre.hxx>
 #include <ctemplate/template.h>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 #include "xWebMLProject.hxx"
 
@@ -78,6 +79,17 @@ std::string xWebProcessContext::getContent(std::string key) const {
   }
 
   return "";
+}
+
+std::string xWebProcessContext::resolveString(std::string value) const
+{
+    std::string prefix = "///string:";
+    if(value.substr(0, prefix.size()) == prefix) {
+        std::string key = value.substr(prefix.size());
+        return _globalStrings->stringForKey(key);
+    }
+    else
+        return value;
 }
 
 std::string xWebProcessContext::workingFolder() const {
