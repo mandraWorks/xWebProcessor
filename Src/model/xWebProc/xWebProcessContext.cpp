@@ -9,6 +9,7 @@
 #include <xsd/cxx/pre.hxx>
 #include <ctemplate/template.h>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 #include "xWebMLProject.hxx"
 
@@ -80,6 +81,17 @@ std::string xWebProcessContext::getContent(std::string key) const {
   return "";
 }
 
+std::string xWebProcessContext::resolveString(std::string value) const
+{
+    std::string prefix = "///string:";
+    if(value.substr(0, prefix.size()) == prefix) {
+        std::string key = value.substr(prefix.size());
+        return _globalStrings->stringForKey(key);
+    }
+    else
+        return value;
+}
+
 std::string xWebProcessContext::workingFolder() const {
     return _workingFolder;
 }
@@ -89,7 +101,7 @@ void xWebProcessContext::initCurrentFolder() {
 
   boost::filesystem::create_directory(currentFolder);
 
-  _currentFolder.push(currentFolder.string());
+  _currentFolder.push_back(currentFolder.string());
 }
 
 void xWebProcessContext::enqueueFolder(std::string folder) {
@@ -100,11 +112,11 @@ void xWebProcessContext::enqueueFolder(std::string folder) {
 
   std::cout << "New folder: " << newFolderPath << std::endl;
 
-  _currentFolder.push(newFolderPath.string());
+  _currentFolder.push_back(newFolderPath.string());
 }
 
 void xWebProcessContext::dequeueFolder() {
-  _currentFolder.pop();
+  _currentFolder.pop_back();
 }
 
 std::string xWebProcessContext::currentFolder() {

@@ -8,7 +8,7 @@
 
 #include <string>
 #include <list>
-#include <queue>
+#include <deque>
 
 namespace xWebML {
 class Settings;
@@ -33,6 +33,7 @@ public:
 
   std::string getString(std::string key) const;
   std::string getContent(std::string key) const;
+  std::string resolveString(std::string value) const;
 
   std::string workingFolder() const;
 
@@ -51,7 +52,7 @@ public:
 private:
   std::string _workingFolder;
   std::string _outputFolder;
-  std::queue<std::string>  _currentFolder;
+  std::deque<std::string>  _currentFolder;
 
   xWebStringList* _globalStrings;
   xWebStringList* _localStrings;

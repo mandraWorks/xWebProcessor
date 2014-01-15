@@ -10,20 +10,24 @@
 #include <map>
 
 namespace xWebML {
-    class StringListType;
+class StringListType;
 }
 
 
 class xWebStringList {
     typedef std::map<std::string,std::string> Container;
-  
+
 public:
-  xWebStringList(std::string contentFile);
+    xWebStringList();
+    xWebStringList(std::string contentFile);
     xWebStringList(xWebML::StringListType& list);
     ~xWebStringList();
     
     void init(std::string contentFile);
     void init(xWebML::StringListType& list);
+
+    void insert(const std::string& key, const std::string& value);
+    void override( const xWebStringList& other );
     
     bool contains(std::string key) const;
     std::string stringForKey(std::string key) const;
@@ -34,6 +38,8 @@ public:
 
     std::string key();
     std::string value();
+
+    void dump();
     
 private:
     Container _data;

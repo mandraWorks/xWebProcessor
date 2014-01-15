@@ -9,6 +9,8 @@
 #include <iostream>
 #include <boost/filesystem.hpp>
 
+#include "model/xWebProc/xWebStringList.h"
+
 
 namespace xWebML {
     class ProjectType; 
@@ -26,6 +28,8 @@ public:
     ~xWebProcessor();
 
     void setProjectFilePath(std::string path);
+
+    void addCLIStringParam(const std::string& key, const std::string& value);
     
     bool run();
     
@@ -43,4 +47,6 @@ private:
     std::string _projectFilePath;
     
     std::auto_ptr<xWebML::ProjectType> _projectFile;
+
+    xWebStringList _cliStrings;
 };

@@ -1,6 +1,7 @@
 
 
 #include <string>
+#include <algorithm>
 #include <boost/program_options.hpp>
 
 #include "xWebProcessorDefs.h"
@@ -18,6 +19,7 @@ int main ( int argc, char **argv )
         desc.add_options()
                 ("help", "shows the help for the program options")
                 ("projectfile", boost::program_options::value<std::string>(), "Sepcify project file")
+                ("stringparam", boost::program_options::value<std::vector< std::string> >(), "Sepcify list of string paramteres which overrides project file strings")
                 ;
 
         boost::program_options::variables_map vm;
@@ -31,8 +33,29 @@ int main ( int argc, char **argv )
             std::string projectfile = vm["projectfile"].as<std::string>();
 
             xWebProcessor processor;
-
             processor.setProjectFilePath(projectfile);
+
+            if ( vm.count("stringparam") )
+            {
+                const std::vector<std::string>& strings = vm["stringparam"].as< std::vector<std::string> >();
+
+                for ( std::vector<std::string>::const_iterator it = strings.begin(); it != strings.end(); it++ )
+                {
+                    std::string str = *it;
+                    std::string delim = ":";
+
+                    std::string::const_iterator start = str.begin();
+                    std::string::const_iterator end = str.end();
+                    std::string::const_iterator pos = std::search(str.begin(), str.end(), delim.begin(), delim.end());
+                    std::string key(start, pos);
+
+                    start = pos + delim.size();
+                    std::string value(start, end);
+
+                    processor.addCLIStringParam(key, value);
+                }
+            }
+
             processor.run();
         }
 

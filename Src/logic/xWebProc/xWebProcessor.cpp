@@ -30,6 +30,11 @@ void xWebProcessor::setProjectFilePath(std::string path) {
     _projectFilePath = path;
 }
 
+void xWebProcessor::addCLIStringParam(const std::string &key, const std::string &value)
+{
+    _cliStrings.insert(key, value);
+}
+
 bool xWebProcessor::run() {
     if ( boost::filesystem::exists(_projectFilePath) == false ) {
         std::cout << "Project file do not exists: " << _projectFilePath << std::endl;
@@ -74,6 +79,8 @@ bool xWebProcessor::run() {
 
 
     xWebProcessContext context(_projectFile->Settings(), basefolder.string());
+
+    context.getGlobalStrings()->override(_cliStrings);
 
     if ( prepareOutputFolder(context) == false ) {
         std::cout << "Prepare output folder faild: " << _projectFilePath<< std::endl;
@@ -153,19 +160,11 @@ bool xWebProcessor::processContent(xWebProcessContext& context, xWebML::FolderTy
 
 bool xWebProcessor::processFolder(xWebProcessContext& context, xWebML::FolderType& folder) {
 
-    std::string folderName = folder.Name();
+    std::string folderName = context.resolveString( folder.Name() );
 
     context.enqueueFolder(folderName);
 
-    xWebML::Children::Folder_iterator it = folder.Children().Folder().begin();
-
-    while ( it != folder.Children().Folder().end() ) {
-        xWebML::FolderType xmlFolder = *it;
-
-        processFolder(context, xmlFolder);
-
-        it++;
-    }
+    processContent(context, folder);
 
     context.dequeueFolder();
 
@@ -179,7 +178,10 @@ bool xWebProcessor::processStaticFolder(xWebProcessContext& context, xWebML::Sta
 
     try
     {
-        currentFolder= boost::filesystem::path(context.currentFolder()) / folderName ;
+        if ( folderName.compare(".") == 0 )
+            currentFolder= boost::filesystem::path(context.currentFolder()) ;
+        else
+            currentFolder= boost::filesystem::path(context.currentFolder()) / folderName ;
     }
     catch (boost::filesystem::filesystem_error const &ex)
     {
@@ -187,8 +189,18 @@ bool xWebProcessor::processStaticFolder(xWebProcessContext& context, xWebML::Sta
         return false;
     }
 
-    if ( boost::filesystem::exists(currentFolder) == true)
-        boost::filesystem::remove_all(currentFolder);
+    if ( boost::filesystem::exists(currentFolder.normalize() ) == true )
+    {
+        try
+        {
+            boost::filesystem::remove_all(currentFolder);
+        }
+        catch (boost::filesystem::filesystem_error const &ex)
+        {
+            std::cout << "ERROR: " << ex.what() << std::endl;
+            return false;
+        }
+    }
 
     //boost::filesystem::create_directory(currentFolder);
 
