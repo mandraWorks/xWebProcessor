@@ -38,6 +38,8 @@ public:
 
     std::string key();
     std::string value();
+
+    void dump();
     
 private:
     Container _data;

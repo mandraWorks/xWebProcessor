@@ -32,6 +32,9 @@ int main ( int argc, char **argv )
         else if ( vm.count("projectfile")) {
             std::string projectfile = vm["projectfile"].as<std::string>();
 
+            xWebProcessor processor;
+            processor.setProjectFilePath(projectfile);
+
             if ( vm.count("stringparam") )
             {
                 const std::vector<std::string>& strings = vm["stringparam"].as< std::vector<std::string> >();
@@ -48,12 +51,11 @@ int main ( int argc, char **argv )
 
                     start = pos + delim.size();
                     std::string value(start, end);
+
+                    processor.addCLIStringParam(key, value);
                 }
             }
 
-            xWebProcessor processor;
-
-            processor.setProjectFilePath(projectfile);
             processor.run();
         }
 

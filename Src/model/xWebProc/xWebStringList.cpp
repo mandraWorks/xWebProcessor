@@ -71,6 +71,13 @@ void xWebStringList::init(xWebML::StringListType& list) {
 
 void xWebStringList::override(const xWebStringList &other)
 {
+    for ( Container::const_iterator it = other._data.begin(); it != other._data.end(); it++ )
+    {
+        if ( _data.find(it->first) != _data.end() )
+            _data[it->first] = it->second;
+        else
+            _data.insert(it,it);
+    }
     _data.insert( other._data.begin(), other._data.end());
 }
 
@@ -110,4 +117,13 @@ std::string xWebStringList::key() {
 
 std::string xWebStringList::value() {
     return _iterator->second;
+}
+
+void xWebStringList::dump()
+{
+    std::cout << "Dump stringlist:" << std::endl;
+    for ( init(); more(); next())
+    {
+        std::cout << key() << ":" << value() << std::endl;
+    }
 }
