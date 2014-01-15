@@ -1,5 +1,23 @@
+set( SRCAUTOGEN_PATH ${xWebProcessor_BINARY_DIR}/Src_autogen )
 
-set( SRCAUTOGEN_PATH ../Src_autogen)
+set( schemas
+  xWebMLLinkList
+  xWebMLProject
+  xWebMLStringList
+  xWebMLTemplate
+)
+
+set( generated_cxx_targets )
+
+foreach( s ${schemas} )
+  add_custom_command( OUTPUT ${SRCAUTOGEN_PATH}/${s}.cxx
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${SRCAUTOGEN_PATH}
+    COMMAND ${XSD_EXECUTABLE} cxx-tree --generate-serialization --output-dir ${SRCAUTOGEN_PATH} ${xWebProcessor_SOURCE_DIR}/Schemas/${s}.xsd
+    DEPENDS ${xWebProcessor_SOURCE_DIR}/Schemas/${s}.xsd
+    COMMENT "Generate cxx source for ${s}"
+  )
+  set( generated_cxx_targets ${generated_cxx_targets} generate_${s} )
+endforeach()
 
 set( xWebProcessor_SRCS
   ${SRCAUTOGEN_PATH}/xWebMLLinkList.cxx
@@ -30,15 +48,18 @@ set( xWebProcessor_HDRS
   logic/xWebProc/xWebTemplateProcessor.h
 )
 
-set( IncludeDirs
+include_directories(
   ${SRCAUTOGEN_PATH}
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-include_directories(${IncludeDirs})
-
 add_executable(xWebProcessor
   ${xWebProcessor_SRCS}
 )
+target_link_libraries(xWebProcessor
+  ${XERCESC_LIBRARY}
+  ${Boost_LIBRARIES}
+  ${CTEMPLATE_LIBRARIES}
+)
 
-target_link_libraries(xWebProcessor ${XERCERS_LIB} ${Boost_LIBRARIES} ${CTEMPLATE_LIB})
+add_dependencies( xWebProcessor ${generated_cxx_targets} ) 
