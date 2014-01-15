@@ -3,9 +3,10 @@ cmake_minimum_required (VERSION 2.8.11)
 project(xWebProcessor)
 
 # version
-set ( xWebProcessor_MAJOR_VERSION 0)
-set ( xWebProcessor_MINOR_VERSION 2)
-set ( xWebProcessor_PATCH_VERSION 0)
+set( xWebProcessor_MAJOR_VERSION 0)
+set( xWebProcessor_MINOR_VERSION 2)
+set( xWebProcessor_PATCH_VERSION 0)
+set( xWebProcessor_VERSION ${xWebProcessor_MAJOR_VERSION}.${xWebProcessor_MINOR_VERSION}.${xWebProcessor_PATCH_VERSION} )
 
 add_definitions( -DMAJOR_VERSION=${xWebProcessor_MAJOR_VERSION})
 add_definitions( -DMINOR_VERSION=${xWebProcessor_MINOR_VERSION})
@@ -51,3 +52,17 @@ install( DIRECTORY Schemas/
 install( DIRECTORY Doc/
   DESTINATION ${INSTALL_SHARE_DIR}/Doc
 )
+
+if( APPLE )
+  set( MACOSX_BUNDLE_INFO_STRING "xWebProcessor ${xWebProcessor_VERSION}" )
+  set( MACOSX_BUNDLE_ICON_FILE  "" )
+  set( MACOSX_BUNDLE_GUI_IDENTIFIER "mandraWorks" )
+  set( MACOSX_BUNDLE_LONG_VERSION_STRING "xWebProcessor ${xWebProcessor_VERSION}" )
+  set( MACOSX_BUNDLE_BUNDLE_NAME  "xWebProcessor" )
+  set( MACOSX_BUNDLE_SHORT_VERSION_STRING "${xWebProcessor_VERSION}" )
+  set( MACOSX_BUNDLE_BUNDLE_VERSION "${xWebProcessor_VERSION}" )
+  set( MACOSX_BUNDLE_COPYRIGHT "" )
+
+  set( MACOSX_BUNDLE_RESOURCES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/xWebProcessor.app/Contents/Resources" )
+  execute_process( COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/xWebProcessor.app/Contents/Resources )
+endif()
