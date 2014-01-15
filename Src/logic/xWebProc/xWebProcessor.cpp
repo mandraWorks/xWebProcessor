@@ -157,15 +157,7 @@ bool xWebProcessor::processFolder(xWebProcessContext& context, xWebML::FolderTyp
 
     context.enqueueFolder(folderName);
 
-    xWebML::Children::Folder_iterator it = folder.Children().Folder().begin();
-
-    while ( it != folder.Children().Folder().end() ) {
-        xWebML::FolderType xmlFolder = *it;
-
-        processFolder(context, xmlFolder);
-
-        it++;
-    }
+    processContent(context, folder);
 
     context.dequeueFolder();
 
@@ -179,7 +171,10 @@ bool xWebProcessor::processStaticFolder(xWebProcessContext& context, xWebML::Sta
 
     try
     {
-        currentFolder= boost::filesystem::path(context.currentFolder()) / folderName ;
+        if ( folderName.compare(".") == 0 )
+            currentFolder= boost::filesystem::path(context.currentFolder()) ;
+        else
+            currentFolder= boost::filesystem::path(context.currentFolder()) / folderName ;
     }
     catch (boost::filesystem::filesystem_error const &ex)
     {
@@ -187,8 +182,18 @@ bool xWebProcessor::processStaticFolder(xWebProcessContext& context, xWebML::Sta
         return false;
     }
 
-    if ( boost::filesystem::exists(currentFolder) == true)
-        boost::filesystem::remove_all(currentFolder);
+    if ( boost::filesystem::exists(currentFolder.normalize() ) == true )
+    {
+        try
+        {
+            boost::filesystem::remove_all(currentFolder);
+        }
+        catch (boost::filesystem::filesystem_error const &ex)
+        {
+            std::cout << "ERROR: " << ex.what() << std::endl;
+            return false;
+        }
+    }
 
     //boost::filesystem::create_directory(currentFolder);
 
