@@ -62,4 +62,8 @@ target_link_libraries(xWebProcessor
   ${CTEMPLATE_LIBRARIES}
 )
 
-add_dependencies( xWebProcessor ${generated_cxx_targets} ) 
+add_dependencies( xWebProcessor ${generated_cxx_targets} )
+
+install( TARGETS xWebProcessor
+  DESTINATION ${INSTALL_BIN_DIR}
+)
