@@ -71,8 +71,10 @@ add_dependencies( xWebProcessor ${generated_cxx_targets} )
 
 install( TARGETS xWebProcessor
   RUNTIME DESTINATION ${INSTALL_BIN_DIR}
-  BUNDLE  DESTINATION ${INSTALL_BIN_DIR}
+  BUNDLE  DESTINATION ${INSTALL_BUNDLE_DIR}
+  COMPONENT Runtime
 )
+
 
 set( CPACK_GENERATOR "TBZ2" )
 set( CPACK_PACKAGE_NAME "xWebProcessor" )
@@ -82,13 +84,53 @@ set( CPACK_PACKAGE_VERSION_PATCH "${xWebProcessor_PATCH_VERSION}" )
 set( CPACK_PACKAGE_VERSION "${WebProcessor_VERSION}" )
 set( CPACK_PACKAGE_VENDOR "mandraWorks" )
 set( CPACK_RESOURCE_FILE_README "${xWebProcessor_SOURCE_DIR}/ReadMe.md" )
-set( CPACK_PACKAGE_FILE_NAME "xWebProcessor-${xWebProcessor_VERSION}")
 
 if( APPLE )
+  set( MACOSX_BUNDLE_INFO_STRING "xWebProcessor ${xWebProcessor_VERSION}" )
+  set( MACOSX_BUNDLE_ICON_FILE "logo.icns" )
+  set( MACOSX_BUNDLE_GUI_IDENTIFIER "mandraWorks" )
+  set( MACOSX_BUNDLE_LONG_VERSION_STRING "xWebProcessor ${xWebProcessor_VERSION}" )
+  set( MACOSX_BUNDLE_BUNDLE_NAME  "xWebProcessor" )
+  set( MACOSX_BUNDLE_SHORT_VERSION_STRING "${xWebProcessor_VERSION}" )
+  set( MACOSX_BUNDLE_BUNDLE_VERSION "${xWebProcessor_VERSION}" )
+  set( MACOSX_BUNDLE_COPYRIGHT "" )
+
+  set(MACOSX_BUNDLE_RESOURCES "${xWebProcessor_BINARY_DIR}/xWebProcessor.app/Contents/Resources")
+  set(MACOSX_BUNDLE_ICON "${xWebProcessor_SOURCE_DIR}/Deployment/${MACOSX_BUNDLE_ICON_FILE}")
+
+  execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${MACOSX_BUNDLE_RESOURCES})
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MACOSX_BUNDLE_ICON} ${MACOSX_BUNDLE_RESOURCES})
+
+  set( CMAKE_INSTALL_PREFIX "/Applications" )
   set( CPACK_GENERATOR "DragNDrop" )
   set( CPACK_DMG_FORMAT "UDBZ" )
   set( CPACK_DMG_VOLUME_NAME "xWebProcessor" )
   set( CPACK_SYSTEM_NAME "OSX" )
+  set( CPACK_PACKAGE_FILE_NAME "xWebProcessor-${xWebProcessor_VERSION}")
+  set( CPACK_PACKAGE_ICON ${MACOSX_BUNDLE_ICON} )
 endif()
 
 include( CPack )
+
+set( CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION "${INSTALL_BIN_DIR}" )
+include( InstallRequiredSystemLibraries )
+
+if( APPLE )
+  set( resource_dest_dir xWebProcessor.app/Contents/Resources )
+  set( EXECUTABLE "\${CMAKE_INSTALL_PREFIX}/xWebProcessor.app" )
+endif()
+
+install( CODE "
+  include( BundleUtilities )
+  fixup_bundle( \"${EXECUTABLE}\" \"\" \"\" )" COMPONENT Runtime
+)
+
+install( DIRECTORY ${xWebProcessor_SOURCE_DIR}/Schemas/
+  DESTINATION ${resource_dest_dir}/Schemas
+  COMPONENT Runtime
+)
+
+install( FILES ${xWebProcessor_SOURCE_DIR}/Deployment/logo.icns
+  DESTINATION ${resource_dest_dir}
+  COMPONENT Runtime
+)

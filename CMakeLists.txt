@@ -38,31 +38,19 @@ find_package( Ctemplate )
 include_directories( ${CTEMPLATE_INCLUDE_DIR} )
 
 # output directories in the binary tree
-set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${xWebProcessor_BINARY_DIR}/bin)
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${xWebProcessor_BINARY_DIR}/bin )
 
 # install directory
-set (INSTALL_BIN_DIR bin CACHE PATH "Installation directory for the executable")
-set (INSTALL_SHARE_DIR share/xWebProcessor CACHE PATH "Installation directory for resources")
+set( INSTALL_BIN_DIR bin CACHE PATH "Installation directory for the executable" )
+set( INSTALL_SHARE_DIR share/xWebProcessor CACHE PATH "Installation directory for resources" )
+set( INSTALL_BUNDLE_DIR . CACHE PATH "Installation directory for bundle" )
 
 add_subdirectory(Src)
 
-install( DIRECTORY Schemas/
-  DESTINATION ${INSTALL_SHARE_DIR}/Schemas
-)
-install( DIRECTORY Doc/
-  DESTINATION ${INSTALL_SHARE_DIR}/Doc
-)
-
-if( APPLE )
-  set( MACOSX_BUNDLE_INFO_STRING "xWebProcessor ${xWebProcessor_VERSION}" )
-  set( MACOSX_BUNDLE_ICON_FILE  "" )
-  set( MACOSX_BUNDLE_GUI_IDENTIFIER "mandraWorks" )
-  set( MACOSX_BUNDLE_LONG_VERSION_STRING "xWebProcessor ${xWebProcessor_VERSION}" )
-  set( MACOSX_BUNDLE_BUNDLE_NAME  "xWebProcessor" )
-  set( MACOSX_BUNDLE_SHORT_VERSION_STRING "${xWebProcessor_VERSION}" )
-  set( MACOSX_BUNDLE_BUNDLE_VERSION "${xWebProcessor_VERSION}" )
-  set( MACOSX_BUNDLE_COPYRIGHT "" )
-
-  set( MACOSX_BUNDLE_RESOURCES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/xWebProcessor.app/Contents/Resources" )
-  execute_process( COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/xWebProcessor.app/Contents/Resources )
-endif()
+#install( DIRECTORY Schemas/
+#  DESTINATION ${INSTALL_SHARE_DIR}/Schemas
+#  COMPONENT Runtime
+#)
+#install( DIRECTORY Doc/
+#  DESTINATION ${INSTALL_SHARE_DIR}/Doc
+#)
