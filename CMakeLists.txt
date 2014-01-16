@@ -47,10 +47,4 @@ set( INSTALL_BUNDLE_DIR . CACHE PATH "Installation directory for bundle" )
 
 add_subdirectory(Src)
 
-#install( DIRECTORY Schemas/
-#  DESTINATION ${INSTALL_SHARE_DIR}/Schemas
-#  COMPONENT Runtime
-#)
-#install( DIRECTORY Doc/
-#  DESTINATION ${INSTALL_SHARE_DIR}/Doc
-#)
+execute_process( COMMAND ${CMAKE_COMMAND} -E copy_directory ${xWebProcessor_SOURCE_DIR}/Schemas ${xWebProcessor_BINARY_DIR}/share/xWebProcessor/Schemas )
