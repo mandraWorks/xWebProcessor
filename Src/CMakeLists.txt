@@ -84,6 +84,7 @@ set( CPACK_PACKAGE_VERSION_PATCH "${xWebProcessor_PATCH_VERSION}" )
 set( CPACK_PACKAGE_VERSION "${xWebProcessor_VERSION}" )
 set( CPACK_PACKAGE_VENDOR "mandraWorks" )
 set( CPACK_RESOURCE_FILE_README "${xWebProcessor_SOURCE_DIR}/README.md" )
+set( CPACK_RESOURCE_FILE_LICENSE "${xWebProcessor}/LICENSE")
 
 if( APPLE )
   set( MACOSX_BUNDLE_INFO_STRING "xWebProcessor ${xWebProcessor_VERSION}" )
@@ -136,5 +137,10 @@ install( CODE "
 
 install( DIRECTORY ${xWebProcessor_SOURCE_DIR}/Schemas/
   DESTINATION ${resource_dest_dir}/Schemas
+  COMPONENT Runtime
+)
+
+install( FILES ${xWebProcessor_SOURCE_DIR}/LICENSE
+  DESTINATION ${resource_dest_dir}
   COMPONENT Runtime
 )
