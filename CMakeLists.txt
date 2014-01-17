@@ -43,6 +43,7 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${xWebProcessor_BINARY_DIR}/bin)
 set (INSTALL_BIN_DIR bin CACHE PATH "Installation directory for the executable")
 set (INSTALL_SHARE_DIR share/xWebProcessor CACHE PATH "Installation directory for resources")
 
+add_subdirectory(Schemas)
 add_subdirectory(Src)
 
 install( DIRECTORY Schemas/

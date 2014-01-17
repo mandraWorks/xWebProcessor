@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<!-- edited with XMLSpy v2009 sp1 (http://www.altova.com) by Jean Plé (Symbios Orthopédie SA) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xWeb="http://www.pspsmartsoft.com/xWebML" targetNamespace="http://www.pspsmartsoft.com/xWebML">
 	<xs:include schemaLocation="xWebMLStringList.xsd"/>
 	<xs:complexType name="FileItemConfigType">
@@ -50,6 +51,7 @@
 				<xs:complexType>
 					<xs:sequence>
 						<xs:element name="OutputFolder" type="xs:string"/>
+						<xs:element name="ContentFolder" type="xs:string" minOccurs="0"/>
 						<xs:element name="StringList" type="xWeb:StringListType"/>
 					</xs:sequence>
 				</xs:complexType>
