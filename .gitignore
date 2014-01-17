@@ -7,3 +7,4 @@ Makefile
 qrc_*
 build/
 Build/
+*.orig
