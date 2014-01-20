@@ -132,7 +132,7 @@ endif()
 
 install( CODE "
   include( BundleUtilities )
-  fixup_bundle( \"${EXECUTABLE}\" \"\" \"\" )" COMPONENT Runtime
+  fixup_bundle( \"${EXECUTABLE}\" \"\" \"${Boost_LIBRARY_DIR}\" )" COMPONENT Runtime
 )
 
 install( DIRECTORY ${xWebProcessor_SOURCE_DIR}/Schemas/
