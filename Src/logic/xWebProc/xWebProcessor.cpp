@@ -78,7 +78,7 @@ bool xWebProcessor::run() {
     }
 
 
-    xWebProcessContext context(_projectFile->Settings(), basefolder.string());
+    xWebProcessContext context(*_projectFile, basefolder.string());
 
     context.getGlobalStrings()->override(_cliStrings);
 

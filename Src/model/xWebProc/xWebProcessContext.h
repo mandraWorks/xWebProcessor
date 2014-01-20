@@ -8,17 +8,19 @@
 
 #include <string>
 #include <list>
+#include <map>
 #include <deque>
 
 namespace xWebML {
 class Settings;
+class ProjectType;
 class StringListType;
 }
 class xWebStringList;
 
 class xWebProcessContext {
 public:
-  xWebProcessContext(xWebML::Settings& settings, std::string workingFolder);
+  xWebProcessContext(xWebML::ProjectType& project, std::string workingFolder);
   ~xWebProcessContext();
 
   void setLocalStrings(xWebStringList* list) { _localStrings = list; }
@@ -50,6 +52,9 @@ public:
   std::string expandTemplate(std::string templ);
 
 private:
+  void buildLanguageMap(std::string contentFolder);
+
+private:
   std::string _workingFolder;
   std::string _outputFolder;
   std::deque<std::string>  _currentFolder;
@@ -61,4 +66,7 @@ private:
   xWebStringList* _content;
 
   std::list<std::string>      _activeMenuIDs;
+
+  std::list<std::string>                _languageKeys;
+  std::map<std::string, xWebStringList> _languages;
 };

@@ -19,14 +19,19 @@
 #include "model/xWebProc/xWebStringList.h"
 
 
-xWebProcessContext::xWebProcessContext(xWebML::Settings& settings, std::string workingFolder) :
+xWebProcessContext::xWebProcessContext(xWebML::ProjectType& project, std::string workingFolder) :
   _workingFolder(workingFolder), _localStrings(0), _activeMenuIDs(0)
 {
 
-  _outputFolder = settings.OutputFolder();
+  _outputFolder = project.Settings().OutputFolder();
 
-  _globalStrings  = new xWebStringList(settings.StringList());
+  _globalStrings  = new xWebStringList(project.Settings().StringList());
   _content        = 0;
+
+  if ( project.Settings().ContentFolder().present() == true )
+      buildLanguageMap(project.Settings().ContentFolder().get());
+  else
+      std::cout << "No content folder specified." << std::endl;
 }
 
 xWebProcessContext::~xWebProcessContext() {
@@ -154,4 +159,30 @@ std::string xWebProcessContext::expandTemplate(std::string templ) {
   tpl->Expand(&output, &dict);
 
   return output;
+}
+
+void xWebProcessContext::buildLanguageMap(std::string contentFolder)
+{
+    _languageKeys.clear();
+    _languages.clear();
+
+    boost::filesystem::path contentFolderPath = contentFolder;
+
+    if ( boost::filesystem::exists(contentFolderPath) == false )
+    {
+        std::cout << "ERROR: Contentfolder do not exists: " << contentFolder << std::endl;
+        return;
+    }
+
+    boost::filesystem::directory_iterator end_it;
+    for ( boost::filesystem::directory_iterator it(contentFolderPath);
+          it != end_it; it++)
+    {
+        if ( boost::filesystem::is_directory(it->status()) == true )
+        {
+            boost::filesystem::path languageFolder = *it;
+            std::string languageKey = languageFolder.filename().string();
+            std::cout << languageKey << std::endl;
+        }
+    }
 }

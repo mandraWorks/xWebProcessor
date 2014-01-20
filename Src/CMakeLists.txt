@@ -55,6 +55,7 @@ include_directories(
 
 add_executable(xWebProcessor
   ${xWebProcessor_SRCS}
+  ${Schemas_SRC}
 )
 target_link_libraries(xWebProcessor
   ${XERCESC_LIBRARY}
