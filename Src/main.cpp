@@ -33,6 +33,7 @@ int main ( int argc, char **argv )
             std::string projectfile = vm["projectfile"].as<std::string>();
 
             xWebProcessor processor;
+            processor.setExecutableFilePath(argv[0]);
             processor.setProjectFilePath(projectfile);
 
             if ( vm.count("stringparam") )

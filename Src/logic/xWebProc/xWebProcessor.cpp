@@ -30,6 +30,11 @@ void xWebProcessor::setProjectFilePath(std::string path) {
     _projectFilePath = path;
 }
 
+void xWebProcessor::setExecutableFilePath(std::string path)
+{
+    _executabelFilePath = path;
+}
+
 void xWebProcessor::addCLIStringParam(const std::string &key, const std::string &value)
 {
     _cliStrings.insert(key, value);
@@ -52,22 +57,30 @@ bool xWebProcessor::run() {
 
     // deploy schemas
     boost::filesystem::path fileInfo(_projectFilePath);
-    boost::filesystem::path schemapath = fileInfo.parent_path();
-    schemapath /= "Schemas";
-    if ( boost::filesystem::exists(schemapath) == true ) {
-        std::cout << "Empty schema folder: " << schemapath << std::endl;
-        boost::filesystem::remove_all(schemapath);
+    boost::filesystem::path schemaPath = fileInfo.parent_path();
+    schemaPath /= "Schemas";
+    if ( boost::filesystem::exists(schemaPath) == true ) {
+        std::cout << "Empty schema folder: " << schemaPath << std::endl;
+        boost::filesystem::remove_all(schemaPath);
     }
 
 
-    boost::filesystem::create_directory( schemapath);
+    boost::filesystem::create_directory( schemaPath);
 
-    boost::filesystem::path sourceSchema = "/Volumes/untitled/WorkMandraworks/Development/xWebProcessor/Schemas";
+    // mac app bundle
+    boost::filesystem::path sourceSchemaPath = boost::filesystem::path(_executabelFilePath).parent_path() / "../Resources/Schemas";
 
-    boost::filesystem::copy( sourceSchema / "xWebMLStringList.xsd", schemapath / "xWebMLStringList.xsd");
-    boost::filesystem::copy( sourceSchema / "xWebMLProject.xsd",    schemapath / "xWebMLProject.xsd");
-    boost::filesystem::copy( sourceSchema / "xWebMLTemplate.xsd",   schemapath / "xWebMLTemplate.xsd");
-    boost::filesystem::copy( sourceSchema / "xWebMLLinkList.xsd",   schemapath / "xWebMLLinkList.xsd");
+    std::cout << "Schema source folder: " << sourceSchemaPath.string() << std::endl;
+
+    if ( boost::filesystem::exists(sourceSchemaPath) == false ) {
+        std::cout << "Schema source folder do not exists: " << sourceSchemaPath << std::endl;
+        return false;
+    }
+
+    boost::filesystem::copy( sourceSchemaPath / "xWebMLStringList.xsd", schemaPath / "xWebMLStringList.xsd");
+    boost::filesystem::copy( sourceSchemaPath / "xWebMLProject.xsd",    schemaPath / "xWebMLProject.xsd");
+    boost::filesystem::copy( sourceSchemaPath / "xWebMLTemplate.xsd",   schemaPath / "xWebMLTemplate.xsd");
+    boost::filesystem::copy( sourceSchemaPath / "xWebMLLinkList.xsd",   schemaPath / "xWebMLLinkList.xsd");
 
     try {
         _projectFile = xWebML::xWebProject(_projectFilePath);

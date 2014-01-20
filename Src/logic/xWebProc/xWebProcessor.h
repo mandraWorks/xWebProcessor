@@ -28,6 +28,7 @@ public:
     ~xWebProcessor();
 
     void setProjectFilePath(std::string path);
+    void setExecutableFilePath(std::string path);
 
     void addCLIStringParam(const std::string& key, const std::string& value);
     
@@ -45,6 +46,7 @@ private:
     
 private:
     std::string _projectFilePath;
+    std::string _executabelFilePath;
     
     std::auto_ptr<xWebML::ProjectType> _projectFile;
 
