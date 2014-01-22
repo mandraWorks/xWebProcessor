@@ -7,6 +7,11 @@ xWebStringsParser::xWebStringsParser(std::string filename) :
 {
 }
 
+void xWebStringsParser::setKeyPrefix(std::string key)
+{
+    _keyPrefix = key;
+}
+
 bool xWebStringsParser::parse() {
     std::ifstream file;
     file.open(_filename.c_str(), std::ios::in);
@@ -69,7 +74,12 @@ void xWebStringsParser::processAssignment() {
 
 void xWebStringsParser::processSemicolon() {
     if ( _currentState == RowFinished ) {
-        _data.insert(std::pair<std::string,std::string>(_currentKey, _currentValue));
+        std::string key;
+        if ( _keyPrefix.length() == 0 )
+            key = _currentKey;
+        else
+            key = _keyPrefix + "_" + _currentKey;
+        _data.insert(std::pair<std::string,std::string>(key, _currentValue));
         _currentKey.clear();
         _currentValue.clear();
 

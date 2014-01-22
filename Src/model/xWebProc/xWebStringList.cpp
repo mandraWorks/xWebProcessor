@@ -22,11 +22,11 @@ xWebStringList::xWebStringList()
 }
 
 xWebStringList::xWebStringList(std::string contentFile) {
-  init(contentFile);
+    init(contentFile);
 }
 
 xWebStringList::xWebStringList(xWebML::StringListType& list) {
-  init(list);
+    init(list);
 }
 
 xWebStringList::~xWebStringList() {
@@ -46,12 +46,12 @@ void xWebStringList::init(std::string contentFile) {
         init(*content);
     }
     else if ( ext1.compare(".strings") == 0 ) {
-      xWebStringsParser parser(contentFile);
+        xWebStringsParser parser(contentFile);
 
-      _data.clear();
-      if ( parser.parse() == true ) {
-        _data = *(parser.data());
-      }
+        _data.clear();
+        if ( parser.parse() == true ) {
+            _data = *(parser.data());
+        }
     }
 }
 
@@ -66,6 +66,32 @@ void xWebStringList::init(xWebML::StringListType& list) {
         _data.insert(std::pair<std::string, std::string>(key, value));
         
         it++;
+    }
+}
+
+void xWebStringList::appendContentFile(std::string contentFile, bool prefix)
+{
+    boost::filesystem::path contentFilePath = contentFile;
+
+    std::string ext1 = boost::algorithm::to_lower_copy( contentFilePath.extension().string());
+    std::string ext2 = boost::algorithm::to_lower_copy( contentFilePath.stem().extension().string());
+
+    if ( (ext1.compare(".xml") == 0) && (ext2.compare(".xwebstringlist") == 0)) {
+        //std::auto_ptr<xWebML::StringListType> content = xWebML::StringList(contentFile);
+
+        //init(*content);
+    }
+    else if ( ext1.compare(".strings") == 0 ) {
+        std::string basefilename = contentFilePath.stem().string();
+        xWebStringsParser parser(contentFile);
+        if ( prefix == true )
+            parser.setKeyPrefix(basefilename);
+
+        if ( parser.parse() == true ) {
+            xWebStringList tempList;
+            tempList._data = *(parser.data());
+            this->override(tempList);
+        }
     }
 }
 

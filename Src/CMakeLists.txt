@@ -24,6 +24,7 @@ set( xWebProcessor_SRCS
   ${SRCAUTOGEN_PATH}/xWebMLProject.cxx
   ${SRCAUTOGEN_PATH}/xWebMLStringList.cxx
   ${SRCAUTOGEN_PATH}/xWebMLTemplate.cxx
+  model/xWebProc/xWebLanguageMap.cpp
   model/xWebProc/xWebProcessContext.cpp
   model/xWebProc/xWebStringList.cpp
   model/xWebProc/xWebStringsParser.cpp
@@ -39,6 +40,7 @@ set( xWebProcessor_HDRS
   ${SRCAUTOGEN_PATH}/xWebMLProject.hxx
   ${SRCAUTOGEN_PATH}/xWebMLStringList.hxx
   ${SRCAUTOGEN_PATH}/xWebMLTemplate.hxx
+  model/xWebProc/xWebLanguageMap.h
   model/xWebProc/xWebProcessContext.h
   model/xWebProc/xWebStringList.h
   model/xWebProc/xWebStringsParser.h
