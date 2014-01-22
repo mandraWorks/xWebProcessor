@@ -69,6 +69,8 @@ xWebFileItemProcessor::~xWebFileItemProcessor() {
 bool xWebFileItemProcessor::run(xWebProcessContext& context) {
     if ( _processingMethod.compare("Transform") == 0 )
         return runTransform(context);
+    if ( _processingMethod.compare("Copy") == 0 )
+        return runCopy(context);
     
     return false;
 }
@@ -85,7 +87,7 @@ bool xWebFileItemProcessor::runTransform(xWebProcessContext& context) {
     if ( boost::filesystem::exists(currentFolder) == false )
       boost::filesystem::create_directory(currentFolder);
 
-    boost::filesystem::path targetFile = currentFolder / _targetFileName;
+    boost::filesystem::path targetFile = currentFolder / context.expandTemplate( _targetFileName );
     
     std::cout << "Generate file: " << targetFile << std::endl;
     
@@ -102,16 +104,7 @@ bool xWebFileItemProcessor::runTransform(xWebProcessContext& context) {
     
     ctemplate::TemplateDictionary dict("File");
 
-    for ( context.getGlobalStrings()->init(); context.getGlobalStrings()->more(); context.getGlobalStrings()->next()) {
-        std::string key = context.getGlobalStrings()->key();
-        std::string value = context.getGlobalStrings()->value();
-        dict.SetValue( key, value);
-    }
-
-    if ( context.getLocalStrings()->contains("BaseName")==true )
-        dict.SetValue("BaseName", context.getLocalStrings()->stringForKey("BaseName"));
-    if ( context.getLocalStrings()->contains("Language")==true )
-        dict.SetValue("Language", context.getLocalStrings()->stringForKey("Language"));
+    context.fillStringDict( &dict );
     
     time_t rawtime;
     struct tm * timeinfo;
@@ -138,6 +131,33 @@ bool xWebFileItemProcessor::runTransform(xWebProcessContext& context) {
     releaseRun(context);
         
     return true;
+}
+
+bool xWebFileItemProcessor::runCopy(xWebProcessContext &context)
+{
+    boost::filesystem::path currentFolder;
+    if ( _outputFolder.length() == 0 )
+      currentFolder = context.currentFolder();
+    else
+      currentFolder = boost::filesystem::path(boost::filesystem::current_path()) / _outputFolder;
+
+    if ( boost::filesystem::exists(currentFolder) == false )
+      boost::filesystem::create_directory(currentFolder);
+
+    boost::filesystem::path targetFile = currentFolder / _targetFileName;
+
+    std::cout << "Destination file: " << targetFile << std::endl;
+
+    boost::filesystem::path absSourceFilePath = boost::filesystem::path(context.workingFolder()) / _sourceFilePath;
+
+    try
+    {
+        boost::filesystem::copy(absSourceFilePath, targetFile);
+    }
+    catch (boost::filesystem::filesystem_error const &ex ) {
+        std::cout << "ERROR: " << ex.what() << std::endl;
+        return false;
+    }
 }
 
 void xWebFileItemProcessor::initRun(xWebProcessContext& context) {

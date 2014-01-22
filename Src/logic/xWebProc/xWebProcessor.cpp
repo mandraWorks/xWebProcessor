@@ -30,6 +30,16 @@ void xWebProcessor::setProjectFilePath(std::string path) {
     _projectFilePath = path;
 }
 
+void xWebProcessor::setExecutableFilePath(std::string path)
+{
+    _executabelFilePath = path;
+}
+
+void xWebProcessor::addCLIStringParam(const std::string &key, const std::string &value)
+{
+    _cliStrings.insert(key, value);
+}
+
 bool xWebProcessor::run() {
     if ( boost::filesystem::exists(_projectFilePath) == false ) {
         std::cout << "Project file do not exists: " << _projectFilePath << std::endl;
@@ -37,32 +47,13 @@ bool xWebProcessor::run() {
     }
 
     boost::filesystem::path projectfile = _projectFilePath;
-    boost::filesystem::path basefolder = boost::filesystem::canonical(projectfile.parent_path());
+    _baseFolder = boost::filesystem::canonical(projectfile.parent_path());
 
-    std::cout << "Project root folder: " << basefolder << std::endl;
+    std::cout << "Project root folder: " << _baseFolder << std::endl;
 
     boost::filesystem::path prevWorking = boost::filesystem::current_path();
 
-    boost::filesystem::current_path(basefolder);
-
-    // deploy schemas
-    boost::filesystem::path fileInfo(_projectFilePath);
-    boost::filesystem::path schemapath = fileInfo.parent_path();
-    schemapath /= "Schemas";
-    if ( boost::filesystem::exists(schemapath) == true ) {
-        std::cout << "Empty schema folder: " << schemapath << std::endl;
-        boost::filesystem::remove_all(schemapath);
-    }
-
-
-    boost::filesystem::create_directory( schemapath);
-
-    boost::filesystem::path sourceSchema = "/Volumes/untitled/WorkMandraworks/Development/xWebProcessor/Schemas";
-
-    boost::filesystem::copy( sourceSchema / "xWebMLStringList.xsd", schemapath / "xWebMLStringList.xsd");
-    boost::filesystem::copy( sourceSchema / "xWebMLProject.xsd",    schemapath / "xWebMLProject.xsd");
-    boost::filesystem::copy( sourceSchema / "xWebMLTemplate.xsd",   schemapath / "xWebMLTemplate.xsd");
-    boost::filesystem::copy( sourceSchema / "xWebMLLinkList.xsd",   schemapath / "xWebMLLinkList.xsd");
+    boost::filesystem::current_path(_baseFolder);
 
     try {
         _projectFile = xWebML::xWebProject(_projectFilePath);
@@ -72,22 +63,91 @@ bool xWebProcessor::run() {
         return false;
     }
 
+    if ( false == deploySchemas() ) return false;
 
-    xWebProcessContext context(_projectFile->Settings(), basefolder.string());
+    if ( false == buildLanguageMap() ) return false;
 
-    if ( prepareOutputFolder(context) == false ) {
-        std::cout << "Prepare output folder faild: " << _projectFilePath<< std::endl;
-        return false;
-    }
+    for ( int i=0 ; i<_languageMap.count(); i++)
+    {
+        std::string languageKey = _languageMap.languageKey(i);
+        xWebStringList language = _languageMap.language(languageKey);
 
-    if ( processContent(context, _projectFile->Content()) == false ) {
-        std::cout << "Process content faild: " << _projectFilePath << std::endl;
-        return false;
+        xWebProcessContext context(*_projectFile, _baseFolder.string(), languageKey, language);
+        context.getGlobalStrings()->override(_cliStrings);
+
+        if ( prepareOutputFolder(context) == false ) {
+            std::cout << "Prepare output folder faild: " << _projectFilePath<< std::endl;
+            return false;
+        }
+
+        if ( processContent(context, _projectFile->Content()) == false ) {
+            std::cout << "Process content faild: " << _projectFilePath << std::endl;
+            return false;
+        }
     }
 
     std::cout << "xWebProcessor succedded" << std::endl;
 
     boost::filesystem::current_path(prevWorking);
+
+    return true;
+}
+
+bool xWebProcessor::deploySchemas()
+{
+    // deploy schemas
+    boost::filesystem::path fileInfo(_projectFilePath);
+    boost::filesystem::path schemaPath = fileInfo.parent_path();
+    schemaPath /= "Schemas";
+    if ( boost::filesystem::exists(schemaPath) == true ) {
+        std::cout << "Empty schema folder: " << schemaPath << std::endl;
+        boost::filesystem::remove_all(schemaPath);
+    }
+
+
+    boost::filesystem::create_directory( schemaPath);
+
+    boost::filesystem::path sourceSchemaPath;
+    std::list<boost::filesystem::path> searchPath;
+    searchPath.push_back(boost::filesystem::path(_executabelFilePath).parent_path() / "../Resources/Schemas");// mac app bundle package
+    searchPath.push_back(boost::filesystem::path(_executabelFilePath).parent_path() / "../../../../share/xWebProcessor/Schemas");// mac dev env
+
+    std::list<boost::filesystem::path>::const_iterator it;
+    bool found = false;
+    for ( it = searchPath.begin(); it != searchPath.end(); it++ )
+    {
+        if ( boost::filesystem::exists(*it) == true ) {
+            std::cout << "Schema source folder found: " << *it << std::endl;
+            sourceSchemaPath = *it;
+            found = true;
+            break;
+        }
+    }
+
+    if ( found == false )
+    {
+        std::cout << "ERROR: schema path not found" << std::endl;
+        return false;
+    }
+
+
+    boost::filesystem::copy( sourceSchemaPath / "xWebMLStringList.xsd", schemaPath / "xWebMLStringList.xsd");
+    boost::filesystem::copy( sourceSchemaPath / "xWebMLProject.xsd",    schemaPath / "xWebMLProject.xsd");
+    boost::filesystem::copy( sourceSchemaPath / "xWebMLTemplate.xsd",   schemaPath / "xWebMLTemplate.xsd");
+    boost::filesystem::copy( sourceSchemaPath / "xWebMLLinkList.xsd",   schemaPath / "xWebMLLinkList.xsd");
+
+    return true;
+}
+
+bool xWebProcessor::buildLanguageMap()
+{
+    boost::filesystem::path baseFolderPath = _baseFolder;
+    boost::filesystem::path contentFolderPath = baseFolderPath / _projectFile->Settings().ContentFolder().get();
+
+    if ( _projectFile->Settings().ContentFolder().present() == true )
+        _languageMap.buildLanguageMap( contentFolderPath.string() );
+    else
+        std::cout << "No content folder specified." << std::endl;
 
     return true;
 }
@@ -153,19 +213,11 @@ bool xWebProcessor::processContent(xWebProcessContext& context, xWebML::FolderTy
 
 bool xWebProcessor::processFolder(xWebProcessContext& context, xWebML::FolderType& folder) {
 
-    std::string folderName = folder.Name();
+    std::string folderName = context.expandTemplate(folder.Name() );
 
     context.enqueueFolder(folderName);
 
-    xWebML::Children::Folder_iterator it = folder.Children().Folder().begin();
-
-    while ( it != folder.Children().Folder().end() ) {
-        xWebML::FolderType xmlFolder = *it;
-
-        processFolder(context, xmlFolder);
-
-        it++;
-    }
+    processContent(context, folder);
 
     context.dequeueFolder();
 
@@ -179,7 +231,10 @@ bool xWebProcessor::processStaticFolder(xWebProcessContext& context, xWebML::Sta
 
     try
     {
-        currentFolder= boost::filesystem::path(context.currentFolder()) / folderName ;
+        if ( folderName.compare(".") == 0 )
+            currentFolder= boost::filesystem::path(context.currentFolder()) ;
+        else
+            currentFolder= boost::filesystem::path(context.currentFolder()) / folderName ;
     }
     catch (boost::filesystem::filesystem_error const &ex)
     {
@@ -187,8 +242,18 @@ bool xWebProcessor::processStaticFolder(xWebProcessContext& context, xWebML::Sta
         return false;
     }
 
-    if ( boost::filesystem::exists(currentFolder) == true)
-        boost::filesystem::remove_all(currentFolder);
+    if ( boost::filesystem::exists(currentFolder.normalize() ) == true )
+    {
+        try
+        {
+            boost::filesystem::remove_all(currentFolder);
+        }
+        catch (boost::filesystem::filesystem_error const &ex)
+        {
+            std::cout << "ERROR: " << ex.what() << std::endl;
+            return false;
+        }
+    }
 
     //boost::filesystem::create_directory(currentFolder);
 

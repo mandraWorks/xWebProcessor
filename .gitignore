@@ -1,8 +1,10 @@
 .DS_Store
 /tmp
 Makefile
-*.pro.user
+*.*.user
 *~
 /Src_autogen
 qrc_*
-*.txt.user
+build/
+Build/
+*.orig
