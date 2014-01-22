@@ -17,13 +17,13 @@ for two reasons: First: it was not a lot of effort (approxiamtly 2 days of work)
 ## How does it work
 The xWebProcessor is a command line tool which has one parameter is input: the project file. The following illustration outlines the basic topologie of the files used during the static web site generation.
 
-![Overview](https://raw.github.com/mandraWorks/xWebProcessor/develop/Doc/Overview.png "xWebProcessor and files")
+![Overview](https://raw.github.com/mandraWorks/xWebProcessor/master/Doc/Overview.png "xWebProcessor and files")
 
 All data processed by the xWebProcessor is presented as XML (embedded or file). In the following I will present the syntaxt of the this XML dialect (xWebML).
 ### The project file
 I use the follwing extension for the project file: xwebproj.xml. It is not mandatory. In the following illustration you can see the schema o fthe project file.
 
-![Project Schema](https://raw.github.com/mandraWorks/xWebProcessor/develop/Doc/project.png "Project Schema")
+![Project Schema](https://raw.github.com/mandraWorks/xWebProcessor/master/Doc/project.png "Project Schema")
 
 The following xml tag in the project file are template acgnostic which means they can be expanded with strings from the main dictionary in xWebProject/Settings/StringList:
 - Name (in Folder tag)
@@ -62,7 +62,7 @@ The content files contains the string list, in general the translations. These f
 
 The schema os the xWebML stringlist is as follows.
 
-![String List Schema](https://raw.github.com/mandraWorks/xWebProcessor/develop/Doc/stringlist.png "String List Schema")
+![String List Schema](https://raw.github.com/mandraWorks/xWebProcessor/master/Doc/stringlist.png "String List Schema")
 
 ### The Templates
 #### Normal string temaples
@@ -85,7 +85,7 @@ present the different XML sections which can be embedded into the html code.
 By placing an XML bloc which validates the following schema, you can indicate the xWebProcessor to include another file
 (cut and paste).
 
-![Include File Schema](https://raw.github.com/mandraWorks/xWebProcessor/develop/Doc/includefile.png "Include File Schema")
+![Include File Schema](https://raw.github.com/mandraWorks/xWebProcessor/master/Doc/includefile.png "Include File Schema")
 
 Here a small code example:
 
@@ -103,7 +103,7 @@ Here a small code example:
 A content link activates a content file which is used in the following text of the html fragment for replacing 
 string or content entires with localized strings.
 
-![Content Link Schema](https://raw.github.com/mandraWorks/xWebProcessor/develop/Doc/contentlink.png "Content Link Schema")
+![Content Link Schema](https://raw.github.com/mandraWorks/xWebProcessor/master/Doc/contentlink.png "Content Link Schema")
 
 Here a small code example:
 
@@ -138,7 +138,7 @@ In order to create a modulare and localized menu you need to create two XML enti
 
 In the following you can see the schema of the XML section which creates a menu in the html fragement.
 
-![Menu Schema](https://raw.github.com/mandraWorks/xWebProcessor/develop/Doc/menu.png "Menu Schema")
+![Menu Schema](https://raw.github.com/mandraWorks/xWebProcessor/master/Doc/menu.png "Menu Schema")
 
 An example:
 
@@ -153,7 +153,7 @@ An example:
 
 The referenced link list file has the following XML schema:
 
-![Link List Schema](https://raw.github.com/mandraWorks/xWebProcessor/develop/Doc/linklist.png "Link List Schema")
+![Link List Schema](https://raw.github.com/mandraWorks/xWebProcessor/master/Doc/linklist.png "Link List Schema")
 
 The tpl file defines a ctemplate for the rendering of each menu entry. See the following example for the content of such a tpl file:
 
