@@ -25,8 +25,38 @@ I use the follwing extension for the project file: xwebproj.xml. It is not manda
 
 ![Project Schema](https://raw.github.com/mandraWorks/xWebProcessor/develop/Doc/project.png "Project Schema")
 
+The following xml tag in the project file are template acgnostic which means they can be expanded with strings from the main dictionary in xWebProject/Settings/StringList:
+- Name (in Folder tag)
+- TargetFileName (in FileItem Tag)
+
+Example:
+```html
+<Folder>
+  <Name>{{VersionKey}}</Name>
+```
+or
+```html
+<FileItem>
+  <ProcessingMethod>Transform</ProcessingMethod>
+  <SourceFilePath>Templates/login.html</SourceFilePath>
+  <TargetFileName>login_{{Language}}.html</TargetFileName>
+```
+### Command line parameters
+The xWebProcessor is a command line application. It can be executed with the following paramters:
+#### *projectfile*
+```
+$ xWebProcessor --projectfile=myProject.xwebproj.xml
+```
+This parameter specifies the path to the project file.
+
+#### *stringparam*
+```
+$ xWebProcessor --projectfile=myProject.xwebproj.xml --stringparam="URI://www.mytest.com/"
+```
+This parameter overrides a value in the main string dictionary of the projectfile (xml path: xWebProject/Settings/StringList). The part of the string before the : is the key and the part after the : is the value. You can pass several stringparams to the application. This type of parameter is very handy for the automatisation of the deployment process (run xWebProcessor during deployment with target machine specific parameters for html generation).
+
 ### The content files
-The content files contains the string list, in general the translations. Currently xWebProcessor supports to formats for the string list:
+The content files contains the string list, in general the translations. These files are stored in the content folder which is specified in the project file. By convention there is one folder for each language in the content folder (for example: fr/,en/,de/). These folders contains the actually string dictionaries for each language. Currently xWebProcessor supports two formats for the string dictionaries:
 - xWebStringList files (part of the xWebML)
 - strings files (Apple string resource files)
 
@@ -35,6 +65,17 @@ The schema os the xWebML stringlist is as follows.
 ![String List Schema](https://raw.github.com/mandraWorks/xWebProcessor/develop/Doc/stringlist.png "String List Schema")
 
 ### The Templates
+#### Normal string temaples
+With the following syntax you can expand strings from the main project dictionary (xWebProject/Settings/StringList):
+```html
+{{URI}}
+```
+With the following syntax you can expand strings from the dictionaries in the content folder (translations):
+```html
+{{Home_Welcome}}
+```
+This will expande the Welcome key from the Home dictionary file in the content folder.
+
 #### The html fragments
 The html fragments contains html blocks which are assembled by the xWebProcessor to the final web pages. 
 These fragments can be injected with XML sections which are processed by the xWebProcessor. in the following I will
