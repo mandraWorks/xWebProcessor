@@ -26,6 +26,8 @@ public:
     void init(std::string contentFile);
     void init(xWebML::StringListType& list);
 
+    void appendContentFile(std::string contentFile, bool prefix);
+
     void insert(const std::string& key, const std::string& value);
     void override( const xWebStringList& other );
     

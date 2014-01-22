@@ -58,7 +58,7 @@ Here a small code example:
 </div>
 ```
 
-##### Content link
+##### Content link *(depcreacted)*
 A content link activates a content file which is used in the following text of the html fragment for replacing 
 string or content entires with localized strings.
 
@@ -77,7 +77,7 @@ Here a small code example:
 <body>
 ```
 
-##### Content string
+##### Content string *(depcreacted)*
 Once you activate a content file you can use strings from this file. In the following example you can see 
 how to use a string identified by its key in your html fragment.
 

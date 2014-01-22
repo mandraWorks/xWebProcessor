@@ -10,6 +10,8 @@ class xWebStringsParser
 public:
   xWebStringsParser(std::string filename);
 
+  void setKeyPrefix(std::string key);
+
   bool parse();
 
   const std::map<std::string,std::string>* data() const { return &_data; }
@@ -32,6 +34,7 @@ private:
   };
 
   std::string    _filename;
+  std::string    _keyPrefix;
 
   ParseState _currentState;
   std::string    _previousChar;

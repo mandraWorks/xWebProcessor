@@ -9,17 +9,19 @@
 #include <string>
 #include <list>
 #include <deque>
+#include <ctemplate/template.h>
 
 namespace xWebML {
 class Settings;
+class ProjectType;
 class StringListType;
 }
 class xWebStringList;
 
 class xWebProcessContext {
 public:
-  xWebProcessContext(xWebML::Settings& settings, std::string workingFolder);
-  ~xWebProcessContext();
+  xWebProcessContext(xWebML::ProjectType& project, std::string workingFolder, std::string language, const xWebStringList& languageStrings);
+  virtual ~xWebProcessContext();
 
   void setLocalStrings(xWebStringList* list) { _localStrings = list; }
   void setCurrentContent(std::string contentFile);
@@ -28,12 +30,15 @@ public:
   void setActiveMenuIDs(std::list<std::string> array);
 
   std::string outputFolder() const { return _outputFolder; }
+
+  void fillStringDict( ctemplate::TemplateDictionary* dict );
+
   xWebStringList* getGlobalStrings() const { return _globalStrings; }
   xWebStringList* getLocalStrings() const { return _localStrings; }
+  xWebStringList* getLanguageStrings() const { return _languageStrings; }
 
   std::string getString(std::string key) const;
   std::string getContent(std::string key) const;
-  std::string resolveString(std::string value) const;
 
   std::string workingFolder() const;
 
@@ -56,9 +61,12 @@ private:
 
   xWebStringList* _globalStrings;
   xWebStringList* _localStrings;
+  xWebStringList* _languageStrings;
 
   std::string     _contentPrefix;
   xWebStringList* _content;
 
   std::list<std::string>      _activeMenuIDs;
+
+  std::string _language;
 };

@@ -87,7 +87,7 @@ bool xWebFileItemProcessor::runTransform(xWebProcessContext& context) {
     if ( boost::filesystem::exists(currentFolder) == false )
       boost::filesystem::create_directory(currentFolder);
 
-    boost::filesystem::path targetFile = currentFolder / _targetFileName;
+    boost::filesystem::path targetFile = currentFolder / context.expandTemplate( _targetFileName );
     
     std::cout << "Generate file: " << targetFile << std::endl;
     
@@ -104,16 +104,7 @@ bool xWebFileItemProcessor::runTransform(xWebProcessContext& context) {
     
     ctemplate::TemplateDictionary dict("File");
 
-    for ( context.getGlobalStrings()->init(); context.getGlobalStrings()->more(); context.getGlobalStrings()->next()) {
-        std::string key = context.getGlobalStrings()->key();
-        std::string value = context.getGlobalStrings()->value();
-        dict.SetValue( key, value);
-    }
-
-    if ( context.getLocalStrings()->contains("BaseName")==true )
-        dict.SetValue("BaseName", context.getLocalStrings()->stringForKey("BaseName"));
-    if ( context.getLocalStrings()->contains("Language")==true )
-        dict.SetValue("Language", context.getLocalStrings()->stringForKey("Language"));
+    context.fillStringDict( &dict );
     
     time_t rawtime;
     struct tm * timeinfo;

@@ -1,8 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>xWebMLLinkList.xsd</file>
-        <file>xWebMLProject.xsd</file>
-        <file>xWebMLStringList.xsd</file>
-        <file>xWebMLTemplate.xsd</file>
-    </qresource>
-</RCC>

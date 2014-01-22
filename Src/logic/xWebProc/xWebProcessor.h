@@ -10,6 +10,7 @@
 #include <boost/filesystem.hpp>
 
 #include "model/xWebProc/xWebStringList.h"
+#include "model/xWebProc/xWebLanguageMap.h"
 
 
 namespace xWebML {
@@ -35,6 +36,8 @@ public:
     bool run();
     
 private:
+    bool deploySchemas();
+    bool buildLanguageMap();
     bool prepareOutputFolder(xWebProcessContext& context);
     bool processContent(xWebProcessContext& context, xWebML::FolderType& root);
     
@@ -47,8 +50,11 @@ private:
 private:
     std::string _projectFilePath;
     std::string _executabelFilePath;
+    boost::filesystem::path _baseFolder;
     
     std::auto_ptr<xWebML::ProjectType> _projectFile;
 
     xWebStringList _cliStrings;
+
+    xWebLanguageMap             _languageMap;
 };
