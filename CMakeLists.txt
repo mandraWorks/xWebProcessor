@@ -4,7 +4,7 @@ project(xWebProcessor)
 
 # version
 set( xWebProcessor_MAJOR_VERSION 0)
-set( xWebProcessor_MINOR_VERSION 2)
+set( xWebProcessor_MINOR_VERSION 3)
 set( xWebProcessor_PATCH_VERSION 0)
 set( xWebProcessor_VERSION ${xWebProcessor_MAJOR_VERSION}.${xWebProcessor_MINOR_VERSION}.${xWebProcessor_PATCH_VERSION} )
 
