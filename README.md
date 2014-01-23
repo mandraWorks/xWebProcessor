@@ -1,6 +1,8 @@
 # xWebProcessor v0.3.0
 ####License
 xWebProcessor is free software distributed under the terms of the MIT license (see LICENSE file).
+####Releases
+You can find binary release versions for Mac in the bin folder.
 ## Introduction
 In contrast to (old school) CMS systems,  modern web application do not rely anymore on the paradigm to generate the 
 final complete html page entirely on the server side (like php, asp, jsp , etc.). Furthermore modern web application deliver only realtime data as ditionaries (json files) from a REST webservice and 
