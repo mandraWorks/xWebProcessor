@@ -1,4 +1,4 @@
-# xWebProcessor v0.2.0
+# xWebProcessor v0.3.0
 ####License
 xWebProcessor is free software distributed under the terms of the MIT license (see LICENSE file).
 ## Introduction
